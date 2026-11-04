@@ -1,0 +1,267 @@
+<Widget version="1" screenWidth="1080" resDensity="480" frameRate="0" scaleByDensity="false" customizedDarkModeWallpaper="true" extraResources="sw1440:den560:1">
+
+    <!-- 负一屏动态支持-->
+    <Var name="priorityEventCode" expression="'other'" type="string" const="true"></Var>
+    <Var name="priorityTimeStamp" expression="formatFloat('%.0f',#time_sys)" type="string" const="true"></Var>
+    <!-- 手机健康 -->
+    <Var name="score" expression="100" type="number" const="true" />
+    <Var name="delayscore" expression="100" type="number" const="true" />
+    <Var name="safe" expression="1" type="number" const="true" />
+    <Var name="startscore" expression="100" type="number" const="true" />
+    <Var name="prevscore" expression="-1" type="number" const="true" />
+    <Var name="aniicon" expression="-1" type="number" const="true" />
+    <Var name="first" expression="-1" type="number" const="true" />
+
+    <!-- 手机垃圾 -->
+    <Var name="garsizes" expression="0" type="number" const="true" />
+    <Var name="clean" expression="0" type="number" const="true" />
+    <Var name="total" expression="0" type="number" const="true" />
+    <Var name="available" expression="0" type="number" const="true" />
+    <Var name="startgarsize" expression="0" type="number" const="true" />
+    <Var name="prevgarsize" expression="-1" type="number" const="true" />
+    <!-- 内存占用 -->
+    <Var name="occupied" expression="0" type="number" const="true" />
+    <Var name="startoccu" expression="0" type="number" const="true" />
+    <Var name="prevoccu" expression="-1" type="number" const="true" />
+    <VariableBinders>
+        <!-- 手机健康 -->
+        <ContentProviderBinder name="scanresult" uri="content://com.miui.securitycenter.widgetProvider/getSecurityScanData" columns="scanScore,scanSafe" countName="securityresult" queryAtStart="true">
+            <Variable name="score" column="scanScore" row="0" />
+            <Variable name="safe" column="scanSafe" row="0" />
+            <Trigger condition="#securityresult!=0">
+                <!-- <VariableCommand name="score" expression="int(rand()*100)" /> -->
+                <VariableCommand name="score" expression="100" condition="#score == 0" />
+                <VariableCommand name="delayscore" expression="#score" delay="200" />
+                <VariableCommand name="startscore" expression="ifelse(#prevscore{0,100, #prevscore)" condition="#prevscore!=#score" />
+
+                <VariableCommand name="priorityEventCode" expression="ifelse(#score {= 80,'notice1',ifelse(#score {= 90 ** #score } 80,'notice10','other'))" type="string" condition="#prevscore!=#score" />
+                <VariableCommand name="priorityTimeStamp" expression="formatFloat('%.0f',#time_sys)" type="string" condition="#prevscore!=#score" />
+
+                <VariableCommand name="first" expression="#prevscore" condition="#prevscore!=-1" />
+                <VariableCommand name="prevscore" expression="#score" condition="#prevscore!=#score" />
+                <VariableCommand name="aniicon" expression="ifelse(#startscore}=80 ** #score}=80,0,#startscore{80 ** #score}=80,0,#startscore{80 ** #score{80,1,1)" />
+
+            </Trigger>
+
+        </ContentProviderBinder>
+        <!-- 手机垃圾 -->
+        <ContentProviderBinder name="garbageresult" uri="content://com.miui.securitycenter.widgetProvider/getCleanMasterData" columns="garbageSize,totalSpace,availableSpace,cleanerinstalledState" countName="garbageresultcount">
+            <Variable name="garsizes" column="garbageSize" />
+            <Variable name="clean" column="cleanerinstalledState" />
+            <Variable name="total" type="number" column="totalSpace" />
+            <Variable name="available" type="number" column="availableSpace" />
+            <Trigger>
+                <!-- <VariableCommand name="garsizes" expression="48000000000" type="number" />
+        <VariableCommand name="total" expression="63000000000" type="number" />
+        <VariableCommand name="available" expression="54000000000" type="number" />
+        <VariableCommand name="clean" expression="1" type="number" /> -->
+                <VariableCommand name="startgarsize" expression="ifelse(#prevgarsize{0,0, #prevgarsize)" condition="#prevgarsize!=#garsizes" />
+                <VariableCommand name="prevgarsize" expression="#garsizes" condition="#prevgarsize!=#garsizes" />
+            </Trigger>
+        </ContentProviderBinder>
+        <!-- 内存占用 -->
+        <ContentProviderBinder name="memoryuse" uri="content://com.miui.securitycenter.widgetProvider/getMemoryData" columns="memoryOccupied,memoryCleanable" countName="memoryresult">
+            <Variable name="occupied" column="memoryOccupied" />
+            <Variable name="cleanable" column="memoryCleanable" />
+            <Trigger>
+                <VariableCommand name="startoccu" expression="ifelse(#prevoccu{0,0, #prevoccu)" condition="#prevoccu!=#occupied" />
+                <VariableCommand name="prevoccu" expression="#occupied" condition="#prevoccu!=#occupied" />
+                <AnimationCommand target="framerateControllerAni" command="play" />
+            </Trigger>
+        </ContentProviderBinder>
+    </VariableBinders>
+    <!-- 开屏刷新 -->
+    <ExternalCommands>
+        <Trigger action="init">
+            <BinderCommand name="scanresult" command="refresh" />
+            <BinderCommand name="garbageresult" command="refresh" />
+            <BinderCommand name="memoryuse" command="refresh" />
+            <IntentCommand action="miui.intent.action.MAML_WIDGET_ADDED" broadcast="true" condition="eqs(@isPreviewMode,'true') == 0">
+                <Extra name="widget_name" type="string" expression="'cleanAndOptimize4*2'" />
+            </IntentCommand>
+        </Trigger>
+        <Trigger action="resume">
+            <BinderCommand name="scanresult" command="refresh" />
+            <BinderCommand name="garbageresult" command="refresh" />
+            <BinderCommand name="memoryuse" command="refresh" />
+        </Trigger>
+    </ExternalCommands>
+    <!-- 动态帧率 -->
+    <FramerateController name="framerateControllerAni" initPause="true" loop="false">
+        <ControlPoint frameRate="60" time="0" />
+        <ControlPoint frameRate="60" time="3000" />
+        <ControlPoint frameRate="0" time="3001" />
+    </FramerateController>
+    <!-- 单位，单位节点 -->
+    <Var name="groupW" expression="#view_width" type="number" />
+    <Var name="groupH" expression="#view_height" type="number" />
+    <Var name="isPreview" expression="eqs(@isPreviewMode,'true')" />
+    <Var name="sca" expression="ifelse(#groupH/440 } 1, 1, (#groupH/440)*(#groupH/440))" type="number" />
+    <Var name="sizeArr" expression="" values="'B','KB','MB','GB','TB'" type="string[]" const="true" />
+    <Var name="numArr" expression="" values="1,1000,1000*1000,1000*1000*1000,1000*1000*1000*1000" type="number[]" const="true" />
+
+    <!-- 内存占用计算 -->
+
+    <Var name="showoccu">
+        <VariableAnimation loop="false" initPause="true">
+            <AniFrame value="#startoccu" time="0" easeType="QuadEaseOut" />
+            <AniFrame value="#occupied" time="2000" />
+        </VariableAnimation>
+    </Var>
+    <Var expression="#occupied" threshold="1">
+        <Trigger>
+            <AnimationCommand target="showoccu" command="play" condition="#occupied}0 ** #isPreview == 0" />
+        </Trigger>
+    </Var>
+    <Var name="memoryType" expression="ifelse(#showoccu { 1000*#numArr[0],0,#showoccu { 1000*#numArr[1],1,#showoccu { 1000*#numArr[2],2,#showoccu { 1000*#numArr[3],3,4)" type="number" />
+    <Var name="memory" expression="#showoccu/#numArr[#memoryType]" type="number" />
+    <Var name="memoryCompany" expression="@sizeArr[#memoryType]" type="string" />
+    <!-- 手机垃圾 -->
+    <Var name="garsize">
+        <VariableAnimation loop="false" initPause="true">
+            <AniFrame value="#startgarsize" time="0" easeType="QuadEaseOut" />
+            <AniFrame value="#garsizes" time="2000" />
+        </VariableAnimation>
+    </Var>
+    <Var expression="#garsizes" threshold="1">
+        <Trigger>
+            <AnimationCommand target="garsize" command="play" condition="#garsizes }= 0 ** #isPreview == 0" />
+        </Trigger>
+    </Var>
+    <Var name="garbageType" expression="ifelse(#garsize { 1000*#numArr[0],0,#garsize { 1000*#numArr[1],1,#garsize { 1000*#numArr[2],2,#garsize { 1000*#numArr[3],3,4)" type="number" />
+    <Var name="garbage" expression="#garsize/#numArr[#garbageType]" type="number" />
+    <Var name="garbageCompany" expression="@sizeArr[#garbageType]" type="string" />
+    <Var name="redColorLimArr" expression="" values="0.3,0.2,0.1" type="number[]" const="true" />
+    <Var name="orangeColorLimArr" expression="" values="2000000000,3000000000,5000000000" type="number[]" const="true" />
+    <Var name="colorIndex" expression="ifelse(le(#total/1000000000,64),0,ifelse(eq(#total/1000000000,128),1,2))" type="number" />
+    <Var name="redColorLim" expression="#redColorLimArr[#colorIndex]" type="number" />
+    <Var name="orangeColorLim" expression="#orangeColorLimArr[#colorIndex]" type="number" />
+    <Var name="compareTotalSpace" expression="#total * #redColorLim" type="number" />
+    <Var name="numberColor" expression="ifelse(lt(#available,#compareTotalSpace),'#FF4544',ifelse(ge(#garsize,#orangeColorLim),'#FF6A20',#__darkmode == 0,'#CC000000','#CCFFFFFF'))" type="string" />
+
+    <!-- 手机健康 -->
+    <Var name="con" expression="ifelse((#startscore == #score || #startscore { 100 ** #startscore }=80 ** #score { 100 ** #score }=80 || #startscore { 80 ** #startscore }=60 ** #score { 80 ** #score }=60 || #startscore { 60 ** #score { 60),0,1) " type="number" />
+    <Var name="showscore">
+        <VariableAnimation loop="false" initPause="true">
+            <AniFrame value="#startscore" time="0" easeType="QuadEaseOut" />
+            <AniFrame value="#score" time="2000" />
+        </VariableAnimation>
+    </Var>
+    <Var name="iconalpha">
+        <VariableAnimation loop="false" initPause="true">
+            <AniFrame value="0" time="0" easeType="QuintEaseOut" />
+            <AniFrame value="255" time="1500" />
+        </VariableAnimation>
+    </Var>
+    <Var name="textalpha">
+        <VariableAnimation loop="false" initPause="true">
+            <AniFrame value="255" time="0" easeType="QuintEaseOut" />
+            <AniFrame value="0" time="100" />
+            <AniFrame value="255" time="300" />
+
+        </VariableAnimation>
+    </Var>
+    <Var name="scale">
+        <VariableAnimation loop="false" initPause="true">
+            <AniFrame value="1" time="0" easeType="CubicEaseOut" />
+            <AniFrame value="0.9" time="100" />
+            <AniFrame value="1" time="300" />
+
+        </VariableAnimation>
+    </Var>
+    <Var expression="#prevscore" threshold="1">
+        <Trigger>
+            <AnimationCommand target="showscore" command="play" condition="#score}0 ** #isPreview == 0" />
+            <AnimationCommand target="textalpha" command="play" condition="#con ** #isPreview == 0" />
+            <VariableCommand name="delayscore" expression="#score" delay="100" condtion="#isPreview == 0" />
+        </Trigger>
+    </Var>
+
+    <Var expression="#aniicon" threshold="1">
+        <Trigger>
+            <AnimationCommand target="iconalpha" command="play" condition="#score}0 ** #isPreview == 0" />
+        </Trigger>
+    </Var>
+    <Var name="showtext" expression="ifelse(#delayscore}=100,@tipsafer,#delayscore}=80,@tipsafe,#delayscore}=60,@tipunsafe,@tipunsafer)" type="string" />
+    <Var name="safeNumColor" expression="ifelse(#__darkmode == 0,'#CC000000','#E6FFFFFF')" type="string" />
+    <Var name="safeTextColor" expression="ifelse(#__darkmode == 0,'#66000000','#66FFFFFF')" type="string" />
+    <Var name="gmTextColor" expression="ifelse(#__darkmode == 0,'#b28C93B0','#66FFFFFF')" type="string" />
+    <Var name="meNumColor" expression="ifelse(#__darkmode == 0,'#CC000000','#CCFFFFFF')" type="string" />
+    <Var name="mebgColor" expression="ifelse(#__darkmode == 0,'#FFFFFF','#1AFFFFFF')" type="string" />
+    <Var name="memoryImg" expression="ifelse(#__darkmode == 0,'assets/memory1.webp','assets/memory1_dark.webp')" type="string" />
+    <Var name="garbageImg" expression="ifelse(#__darkmode == 0,'assets/garbage1.webp','assets/garbage1_dark.webp')" type="string" />
+    <Group x="#groupW/2" y="#groupH/2" w="#groupW" h="#groupH">
+        <Rectangle x="-#groupW/2" y="-#groupH/2" w="#groupW" h="#groupH" fillColor="#f5f5f5" cornerRadius="46" visibility="#__darkmode == 0" />
+        <Rectangle x="-#groupW/2" y="-#groupH/2" w="#groupW" h="#groupH" fillColor="#1A1A1B" cornerRadius="46" visibility="#__darkmode == 1" />
+        <!-- 手机健康 -->
+        <Image x="-#groupW/2 + 34" y="-#groupH/2 + 38" src="assets/danager2.webp" alpha="ifelse(#isPreview == 0,ifelse(#aniicon==0,255 - #iconalpha,#iconalpha),0)" visibility="ifelse(#isPreview == 0,(#first==-1 ** #score{80) || #first}=0,0)" />
+        <Image x="-#groupW/2 + 34" y="-#groupH/2 + 38" src="assets/safe2.webp" alpha="ifelse(#isPreview == 0,ifelse(#aniicon==0,#iconalpha,255 - #iconalpha),255)" visibility="ifelse(#isPreview == 0,(#first==-1 ** #score}=80) || #first}=0 || #first == -1,1)" />
+        <Text name="heltext" x="-#groupW/2 + 42" y="#groupH/2 - 50*#sca" alignV="bottom" color="@safeTextColor" size="ifelse(#groupH }= 390,34,28)" alpha="#textalpha" textExp="ifelse(#isPreview == 0,@showtext,@tipsafer)" width="#groupW*0.4" multiLine="true" fontFamily="mipro-medium" />
+        <Text x="-#groupW/2 + 40" y="ifelse(#heltext.text_width } #groupW*0.4,#groupH/2 - 160*#sca,#groupH/2 - 90*#sca)" alignV="bottom" color="@safeNumColor" size="120" textExp="int(#showscore)" fontFamily="mitype-semibold" />
+        <!-- 手机垃圾 -->
+        <Group name="anigarbage" x="#groupW/2 - 32 - (#groupW * 0.485)/2" y="-#groupH/2 + 32 + (#groupH - 90)/4" w="(#groupW * 0.485)" height="(#groupH - 90)/2">
+            <ScaleAnimation initPause="true" loop="false" easeType="CubicEasyOut">
+                <Item value="1" time="0" />
+                <Item value="0.9" time="100" />
+                <Item value="1" time="300" />
+            </ScaleAnimation>
+            <Rectangle x="(-#groupW * 0.485)/2" y="-(#groupH - 90)/4" w="#groupW * 0.485" h="(#groupH - 90)/2" fillColor="@mebgColor" cornerRadius="32" />
+            <Text x="(-#groupW * 0.485)/2 + 34" y="-(#groupH - 90)/4 + 30*#sca" color="@gmTextColor" size="ifelse(#groupH }= 390,34,28)" textExp="@tipgarbage" fontFamily="mipro-medium" width="#groupW * 0.485 - 130" marqueeSpeed="30" />
+            <Text name="garbage" x="(-#groupW * 0.485)/2 + 34" y="(#groupH - 90)/4 - 23*#sca" alignV="bottom" color="@numberColor" size="ifelse(#groupH }= 390,64,52)" visibility="#clean == 1" textExp="ifelse(#isPreview == 0,preciseeval(#garbage,2),'315.89')" fontFamily="mitype-mono-bold" />
+            <Text x="(-#groupW * 0.485)/2 + 34 + #garbage.text_width + 10" y="(#groupH - 90)/4 - 27*#sca" alignV="bottom" color="@numberColor" size="30" visibility="#clean == 1" textExp="ifelse(preciseeval(#garbage,2)}0,@garbageCompany,'MB')" fontFamily="mipro-medium" />
+            <Text name="none" x="(-#groupW * 0.485)/2 + 34" y="(#groupH - 90)/4 - 23*#sca" alignV="bottom" color="@numberColor" size="ifelse(#groupH }= 390,64,52)" visibility="#clean == 0" textExp="ifelse(#isPreview == 0,'--','315.89')" fontFamily="mitype-mono-bold" />
+            <Text x="(-#groupW * 0.485)/2 + 34 + #none.text_width + 10" y="(#groupH - 90)/4 - 27*#sca" alignV="bottom" color="@numberColor" size="30" visibility="#clean == 0 ** #isPreview != 0" textExp="'MB'" fontFamily="mipro-medium" />
+            <Image x="(#groupW * 0.485)/2" y="-(#groupH - 90)/4" align="right" src="@garbageImg" />
+        </Group>
+        <!-- 内存占用 -->
+        <Group name="animemory" x="#groupW/2 - 32 - (#groupW * 0.485)/2" y="#groupH/2 - 32 - (#groupH - 90)/4" w="(#groupW * 0.485)" height="(#groupH - 90)/2">
+            <ScaleAnimation initPause="true" loop="false" easeType="CubicEasyOut">
+                <Item value="1" time="0" />
+                <Item value="0.9" time="100" />
+                <Item value="1" time="300" />
+            </ScaleAnimation>
+            <Rectangle x="(-#groupW * 0.485)/2" y="-(#groupH - 90)/4" w="#groupW * 0.485" h="(#groupH - 90)/2" fillColor="@mebgColor" cornerRadius="32" />
+            <Text x="(-#groupW * 0.485)/2 + 34" y="-(#groupH - 90)/4 + 30*#sca" name="textmemory" color="@gmTextColor" size="ifelse(#groupH }= 390,34,28)" textExp="@tipmemory" fontFamily="mipro-medium" width="#groupW * 0.485 - 130" marqueeSpeed="30" />
+            <Text name="memory" x="(-#groupW * 0.485)/2 + 34" y="(#groupH - 90)/4 - 23*#sca" alignV="bottom" color="@meNumColor" size="ifelse(#groupH }= 390,64,52)" textExp="ifelse(#isPreview == 0,preciseeval(#memory,2),'23.6')" fontFamily="mitype-mono-bold" />
+            <Text x="(-#groupW * 0.485)/2 + 34 + #memory.text_width + 10" y="(#groupH - 90)/4 - 27*#sca" alignV="bottom" color="@meNumColor" size="30" textExp="ifelse(#isPreview == 0,@memoryCompany,'MB')" fontFamily="mipro-medium" />
+            <Image x="(#groupW * 0.485)/2" y="-(#groupH - 90)/4" align="right" src="@memoryImg" />
+            <!-- <Text x="(-#groupW * 0.485)/2 + 34" y="(#groupH - 90)/4 - 113" size="20" textExp="#occupied" /> -->
+        </Group>
+        <!-- 手机健康按钮 -->
+        <Button x="-#groupW/2" y="-#groupH/2" w="#groupW * 0.47" h="#groupH" contentDescriptionExp="int(#showscore)+@showtext">
+            <Triggers>
+                <Trigger action="up">
+                    <IntentCommand action="miui.intent.action.SECURITY_CENTER" package="com.miui.securitycenter">
+                        <Extra name="extra_auto_optimize_widget" type="int" expression="1" />
+                        <Extra name="enter_homepage_way" type="string" expression="'maml_pm_4x2'" />
+                    </IntentCommand>
+                </Trigger>
+            </Triggers>
+        </Button>
+        <!-- 手机垃圾按钮 -->
+        <Button x="#groupW/2 - 32 - #groupW * 0.485" y="-#groupH/2 + 32" w="(#groupW * 0.485)" height="(#groupH - 90)/2" contentDescriptionExp="@tipgarbage + preciseeval(#garbage,2) + ifelse(preciseeval(#garbage,2)}0,@garbageCompany,'MB')">
+            <Triggers>
+                <Trigger action="up">
+                    <AnimationCommand target="framerateControllerAni" command="play" />
+                    <AnimationCommand target="anigarbage" command="play" />
+                    <IntentCommand action="com.miui.cleanmaster.InstallAndLunchCleanMaster" package="com.miui.securitycenter" delay="300">
+                        <Extra name="enter_homepage_way" type="string" expression="'maml_pm_4x2'"></Extra>
+                    </IntentCommand>
+                </Trigger>
+            </Triggers>
+        </Button>
+        <!-- 内存占用按钮 -->
+        <Button x="#groupW/2 - 32 - #groupW * 0.485" y="13" w="(#groupW * 0.485)" height="(#groupH - 90)/2" contentDescriptionExp="@tipmemory + preciseeval(#memory,2) + @memoryCompany">
+            <Triggers>
+                <Trigger action="up">
+                    <AnimationCommand target="framerateControllerAni" command="play" />
+                    <AnimationCommand target="animemory" command="play" />
+                    <IntentCommand action="miui.intent.action.OPTIMIZE_MANAGE" package="com.miui.securitycenter" delay="300">
+                        <Extra name="enter_homepage_way" type="string" expression="'maml_pm_4x2'"></Extra>
+                    </IntentCommand>
+                </Trigger>
+            </Triggers>
+        </Button>
+
+    </Group>
+</Widget>

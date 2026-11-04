@@ -1,0 +1,463 @@
+<Widget version="2" useVariableUpdater="DateTime.Hour,DateTime.Minute" frameRate="0" disableCutRoundCorner="false" supportBackgroundBlur="true" scaleByDensity="false" screenWidth="1080" type="awesome" allowScreenRotation="true">
+  <Var name="__debug" type="number" expression="1" const="true"/>
+  <Var name="sr" type="number" expression="ifelse((#view_width { 1200),(#view_width / 334),(950 / 334))"/>
+  <Var name="scaleX" type="number" expression="#sr"/>
+  <Var name="scaleY" type="number" expression="ifelse((#view_height { 500),(#view_height / 150),(440 / 150))"/>
+  <Var name="bg_color" type="string" expression="ifelse(#__darkmode,'#1A1A1B','#FFFFFF')"/>
+  <Var name="text_color" type="string" expression="ifelse(#__darkmode,'#ffffff','#000000')"/>
+  <Var name="text_alpha" type="number" expression="ifelse(#__darkmode,(255 * 0.95),255)"/>
+  <Var name="primary_color" type="string" expression="ifelse(#__darkmode,'#4788ff','#3482ff')"/>
+  <Var name="album_bg_text_color" type="string" expression="ifelse(#__darkmode,'#ffffff','#000000')"/>
+  <Var name="album_bg_alpha" type="number" expression="ifelse(#__darkmode,0.06,0.04)"/>
+  <Var name="cur_date" type="string" expression="''" const="true"/>
+  <Var name="temp_date" type="string" expression="''" const="true"/>
+  <Var name="chinese_festival_name" type="string" expression="''" const="true"/>
+  <Var name="festival" type="string" expression="''" const="true"/>
+  <Var name="fest_text_length" type="number" expression="len(@festival)"/>
+  <Var name="set_festival_flag" type="number" expression="0" const="true"/>
+  <Var name="need_show_festivals" type="string[]" values="'元旦','春节','清明','劳动节','端午节','中秋','国庆节','立春','雨水','惊蛰','春分','谷雨','立夏','小满','芒种','夏至','小暑','大暑','立秋','处暑','白露','秋分','寒露','霜降','立冬','小雪','大雪','冬至','小寒','大寒','春節','勞動節','端午節','國慶節','驚蟄','小滿','芒種','處暑','穀雨'" const="true"/>
+  <Var name="date_w" type="number" expression="(88 * #scaleX)"/>
+  <Var name="date_h" type="number" expression="#view_height"/>
+  <!-- 图片区自适应填充：宽=部件宽-日期列(88)-右边距(6)，高=部件高-上下边距(各6)；
+       基于真实 view_width/view_height，不受 scaleX/scaleY 封顶影响，折叠屏横竖屏都铺满 -->
+  <Var name="album_w" type="number" expression="(#view_width - (94 * #scaleX))"/>
+  <Var name="album_h" type="number" expression="(#view_height - (12 * #scaleY))"/>
+  <Var name="weekday_date_text_wrapper_w" type="number" expression="((#date_w - (15 * #scaleX)) - (6 * #scaleX))"/>
+  <Var name="weekday_text_template_w" type="number" expression="#weekday_text_template.text_width"/>
+  <Var name="weekday_text_scale" type="number" expression="ifelse((#weekday_text_template_w {= #weekday_date_text_wrapper_w),1,(#weekday_date_text_wrapper_w / #weekday_text_template_w))"/>
+  <Var name="festival_date_text_wrapper_w" type="number" expression="(#date_w - ((6 * #scaleX) * 2))"/>
+  <Var name="festival_date_text_template_w" type="number" expression="#date_text_template.text_width + #fes_weekday_text_template.text_width"/>
+  <Var name="is_horizontal_date" type="number" expression="(#festival_date_text_wrapper_w }= #festival_date_text_template_w)"/>
+  <Var name="festival_text_part_h" type="number" expression="ifelse(#is_horizontal_date,(120 * #scaleY),(113 * #scaleY))"/>
+  <Var name="second_fes_weekday_text_template_w" type="number" expression="#second_fes_weekday_text_template.text_width"/>
+  <Var name="second_fes_weekday_text_scale" type="number" expression="ifelse((#second_fes_weekday_text_template_w {= #festival_date_text_wrapper_w),1,(#festival_date_text_wrapper_w / #second_fes_weekday_text_template_w))"/>
+  <Var name="album_x" type="number" expression="(88 * #scaleX)"/>
+  <Var name="album_y" type="number" expression="(6 * #scaleY)"/>
+  <Var name="is_rtl" type="number" expression="eqs(@RTL,'1')"/>
+  <Var name="is_BO" type="number" expression="eqs(@language,'bo_CN')"/>
+  <Var name="is_TW" type="number" expression="eqs(@is_TW,'1')"/>
+  <Var name="festival_font_path" type="string" expression="ifelse(#is_TW,'/product/fonts/MiSerifTCVF.ttf','/product/fonts/MiSerifSCVF.ttf')"/>
+  <Var name="ani_count" type="number" expression="0" const="true"/>
+  <Var name="met_resume" type="number" expression="0" const="true"/>
+  <Var name="img1" type="jsonO" expression="newJsonObject()" const="true"/>
+  <Var name="img2" type="jsonO" expression="newJsonObject()" const="true"/>
+  <Var name="id" type="number" expression="0" const="true"/>
+  <Var name="img_url" type="string" expression="''" const="true"/>
+  <Var name="show_img_url" type="string" expression="''" const="true"/>
+  <!-- picture url 探测查询是否进行中：用于去重，避免在上一次查询返回前重复刷新导致反复 Cancelled -->
+  <Var name="img_querying" type="number" expression="0" const="true"/>
+  <!-- 最近一次成功显示图片的日期(yyyyMMdd)，用于检测跨天后图片是否已更新 -->
+  <Var name="img_loaded_date" type="string" expression="''" const="true"/>
+  <Var name="image_load_failed" type="number" expression="0" const="true"/>
+  <!-- 图片加载失败重试计数与上限：provider 当前日期无图(如时间被改到有效范围外)或位图暂不可用时，
+       先重试若干次吸收瞬时坏数据，仍失败才清除旧图并展示"加载失败"，避免旧图常驻 -->
+  <Var name="img_retry_count" type="number" expression="0" const="true"/>
+  <Var name="img_retry_max" type="number" expression="5" const="true"/>
+  <!-- picture_data 查询结果行数；0行时 id 可能残留上次的值，必须先判断有数据 -->
+  <Var name="has_img_data" type="number" expression="0" const="true"/>
+  <Var name="show_type" type="number" expression="0" const="true"/>
+  <Var name="current_displaying_img_id" type="number" expression="(- 1)" const="true"/>
+  <Var name="current_top_image" type="number" expression="(- 1)" const="true"/>
+  <Var name="agree_with_cta" type="string" expression="''" const="true"/>
+  <Var name="text_for_load" type="string" expression="ifelse((#image_load_failed == 1),@load_failed_text,@loading_text)"/>
+  <!-- CTA 明确未授权才显示授权引导文案；已授权或尚未查到授权结果时显示「正在加载图片」/「图片加载失败」 -->
+  <Var name="text_for_display" type="string" expression="ifelse(eqs(@agree_with_cta,'false'),@cta_text,@text_for_load)"/>
+  <Var name="album_talkback" type="string" expression="@talkback_calendar_album" const="true"/>
+  <Var name="content_description" type="string" expression="(((formatDate(@talkback_date,#time_sys) + @festival) + ',') + @album_talkback)"/>
+  <Var name="intervalByDate" expression="#date" threshold="1" type="number">
+    <Trigger>
+      <!-- 跨天时清除"探测进行中"标记并重置重试计数，确保新的一天即使上次查询失败也能重新查询图片 -->
+      <VariableCommand name="img_querying" expression="0" type="number"/>
+      <VariableCommand name="img_retry_count" expression="0" type="number"/>
+      <BinderCommand name="calendarCTA" command="refresh"/>
+    </Trigger>
+  </Var>
+  <!-- 兜底重试：已授权但当天图片仍未成功加载时，每分钟重试一次，加载成功后自动停止；
+       覆盖"跨天首次查询失败且期间没有 resume 事件"（如常亮/副屏一直可见）的场景，不会无限查询 -->
+  <Var name="retryByMinute" expression="#minute" threshold="1" type="number">
+    <Trigger>
+      <VariableCommand name="temp_date" expression="formatDate('yyyyMMdd',#time_sys)" type="string"/>
+      <MultiCommand condition="(eqs(@agree_with_cta,'true') ** (! eqs(@img_loaded_date,@temp_date)))">
+        <VariableCommand name="img_querying" expression="0" type="number"/>
+        <BinderCommand name="calendarCTA" command="refresh"/>
+      </MultiCommand>
+    </Trigger>
+  </Var>
+  <Function name="on_ani_finish">
+    <MultiCommand condition="(#ani_count == 0)">
+      <FrameRateCommand rate="0"/>
+    </MultiCommand>
+  </Function>
+  <Function name="show_text">
+    <FrameRateCommand rate="30"/>
+    <VariableCommand name="ani_count" expression="1" type="number"/>
+    <VariableCommand name="current_top_image" expression="(- 1)" type="number"/>
+    <VariableCommand name="current_displaying_img_id" expression="(- 1)" type="number"/>
+    <VariableCommand name="show_img_url" expression="''" type="string"/>
+    <FolmeCommand target="load_text" states="'folme_state_0'" config="'folme_config_0'" command="to"/>
+    <FolmeCommand target="img1_wrapper" states="'folme_state_1'" config="'folme_config_1'" command="to"/>
+    <FolmeCommand target="img2_wrapper" states="'folme_state_2'" config="'folme_config_2'" command="to"/>
+  </Function>
+  <Function name="show_error">
+    <VariableCommand name="image_load_failed" expression="1" type="number"/>
+    <FunctionCommand target="show_text"/>
+  </Function>
+  <!-- 图片查询失败(空游标/无数据)统一入口：立即清除旧图，未达重试上限先展示"正在加载图片"
+       并每2秒重探，5次重试耗尽再展示"图片加载失败"。切到无图日期时不保留上一张图 -->
+  <Function name="handle_image_fail">
+    <IfCommand ifCondition="(#img_retry_count }= #img_retry_max)">
+      <Consequent>
+        <FunctionCommand target="show_error"/>
+      </Consequent>
+      <Alternate>
+        <!-- 未达上限：清除旧图并展示"正在加载图片"(image_load_failed=0)，延迟后经 calendarCTA 重新探测 -->
+        <VariableCommand name="img_retry_count" expression="#img_retry_count + 1" type="number"/>
+        <VariableCommand name="image_load_failed" expression="0" type="number"/>
+        <FunctionCommand target="show_text"/>
+        <VariableCommand name="img_querying" expression="0" type="number"/>
+        <BinderCommand name="calendarCTA" command="refresh" delay="2000"/>
+      </Alternate>
+    </IfCommand>
+  </Function>
+  <Function name="show_image1">
+    <FrameRateCommand rate="30"/>
+    <VariableCommand name="ani_count" expression="1" type="number"/>
+    <VariableCommand name="current_top_image" expression="1" type="number"/>
+    <VariableCommand name="image_load_failed" expression="0" type="number"/>
+    <VariableCommand name="img_retry_count" expression="0" type="number"/>
+    <FolmeCommand target="img1_wrapper" states="'folme_state_3'" config="'folme_config_3'" command="to"/>
+    <FolmeCommand target="img2_wrapper" states="'folme_state_4'" config="'folme_config_4'" command="to"/>
+    <FolmeCommand target="load_text" states="'folme_state_5'" config="'folme_config_5'" command="to"/>
+  </Function>
+  <Function name="show_image2">
+    <FrameRateCommand rate="30"/>
+    <VariableCommand name="ani_count" expression="1" type="number"/>
+    <VariableCommand name="current_top_image" expression="2" type="number"/>
+    <VariableCommand name="image_load_failed" expression="0" type="number"/>
+    <VariableCommand name="img_retry_count" expression="0" type="number"/>
+    <FolmeCommand target="img1_wrapper" states="'folme_state_6'" config="'folme_config_6'" command="to"/>
+    <FolmeCommand target="img2_wrapper" states="'folme_state_7'" config="'folme_config_7'" command="to"/>
+    <FolmeCommand target="load_text" states="'folme_state_8'" config="'folme_config_8'" command="to"/>
+  </Function>
+  <Function name="bind_on_resume">
+    <IfCommand ifCondition="(#met_resume == 1)">
+      <Consequent>
+        <VariableCommand name="temp_date" expression="formatDate('yyyyMMdd',#time_sys)" type="string"/>
+        <MultiCommand condition="(! eqs(@cur_date,@temp_date))">
+          <VariableCommand name="show_type" expression="0" type="number"/>
+        </MultiCommand>
+        <!-- 每次可见时清除"探测进行中"标记，避免上一次查询失败/取消导致标记卡住而无法重试；
+             同时重置重试次数，重新给满5次重试 -->
+        <VariableCommand name="img_querying" expression="0" type="number"/>
+        <VariableCommand name="img_retry_count" expression="0" type="number"/>
+        <BinderCommand name="calendarCTA" command="refresh"/>
+      </Consequent>
+      <Alternate>
+        <VariableCommand name="met_resume" expression="1" type="number"/>
+      </Alternate>
+    </IfCommand>
+  </Function>
+  <Function name="handleJumpCalendar">
+    <MultiCommand condition="(! @isPreviewMode)">
+      <IntentCommand action="com.android.calendar.main.views" package="com.android.calendar" class="com.android.calendar.AllInOneActivity" uriExp="'content://com.android.calendar/view/7'"/>
+    </MultiCommand>
+  </Function>
+  <Rectangle x="(#view_width / 2)" y="(#view_height / 2)" w="#view_width" h="#view_height" fillColor="@bg_color" visibility="(! #enable_background_blur)" align="center" alignV="center"/>
+  <Group name="template">
+    <Group name="weekday_part_template" alpha="0">
+      <Text textExp="formatDate(@week_format,#time_sys)" size="(14 * #sr)" name="weekday_text_template" fontFamily="mipro"/>
+    </Group>
+    <Group name="festival_part_template" alpha="0">
+      <Text textExp="(formatDate(@festival_date_format,#time_sys) + ' ')" size="(13 * #sr)" name="date_text_template" fontFamily="mipro"/>
+      <Text textExp="formatDate(@week_format,#time_sys)" size="(13 * #sr)" name="fes_weekday_text_template" fontFamily="mipro"/>
+      <Text textExp="formatDate(@week_format,#time_sys)" size="(11 * #sr)" name="second_fes_weekday_text_template" fontFamily="mipro"/>
+    </Group>
+  </Group>
+  <Group name="date_part" alpha="255">
+    <Group x="(14 * #scaleX)" visibility="(#show_type != 2)" name="weekday_part">
+      <Text y="(10 * #scaleY)" textExp="formatDate(@weekday_date_format,#time_sys)" size="(14 * #sr)" color="@text_color" alpha="#text_alpha" name="date_text" fontPath="/product/fonts/MiSerifSCVF.ttf" fontPathWeight="500"/>
+      <Text textExp="formatDate(@weekday_day_format,#time_sys)" size="(38 * #sr)" color="@text_color" alpha="#text_alpha" name="day_text" y="#view_height - #day_text.text_height - #weekday_text.text_height - 8 * #scaleY" fontPath="/product/fonts/MiSerifSCVF.ttf" fontPathWeight="500"/>
+      <Text textExp="formatDate(@week_format,#time_sys)" size="((14 * #sr) * #weekday_text_scale)" color="@primary_color" name="weekday_text" y="#view_height - #weekday_text.text_height - 10 * #scaleY" fontFamily="mipro"/>
+    </Group>
+    <Group y="(2 * #scaleY)" visibility="(#show_type == 2)" name="festival_part">
+      <Group x="(26.5 * #scaleX)" visibility="(#fest_text_length == 2)" name="festival_text_2_part" y="(#festival_text_part_h - 33 * #scaleY - 10 * #scaleY - #festival_text_2.text_height) / 2">
+        <Group>
+          <Text y="(((33 * #scaleY) * 0) + ((10 * #scaleY) * 0))" textExp="substr(@festival,(0 * 1),1)" size="(35 * #sr)" fontPath="@festival_font_path" color="@text_color" alpha="#text_alpha" name="festival_text_2" fontPathWeight="500" bold="true"/>
+          <Text y="(((33 * #scaleY) * 1) + ((10 * #scaleY) * 1))" textExp="substr(@festival,(1 * 1),1)" size="(35 * #sr)" fontPath="@festival_font_path" color="@text_color" alpha="#text_alpha" name="festival_text_2" fontPathWeight="500" bold="true"/>
+        </Group>
+      </Group>
+      <Group x="(29 * #scaleX)" visibility="(#fest_text_length == 3)" name="festival_text_3_part" y="(#festival_text_part_h - 33 * #scaleY * 2 - #festival_text_3.text_height) / 2">
+        <Group>
+          <Text y="((33 * #scaleY) * 0)" textExp="substr(@festival,(0 * 1),1)" size="(30 * #sr)" fontPath="@festival_font_path" color="@text_color" alpha="#text_alpha" name="festival_text_3" fontPathWeight="500" bold="true"/>
+          <Text y="((33 * #scaleY) * 1)" textExp="substr(@festival,(1 * 1),1)" size="(30 * #sr)" fontPath="@festival_font_path" color="@text_color" alpha="#text_alpha" name="festival_text_3" fontPathWeight="500" bold="true"/>
+          <Text y="((33 * #scaleY) * 2)" textExp="substr(@festival,(2 * 1),1)" size="(30 * #sr)" fontPath="@festival_font_path" color="@text_color" alpha="#text_alpha" name="festival_text_3" fontPathWeight="500" bold="true"/>
+        </Group>
+      </Group>
+      <Group x="(6 * #scaleX)" y="(134 * #scaleY)" visibility="#is_horizontal_date" name="festival_date_horizontal_part">
+        <Group visibility="(! #is_rtl)">
+          <Text textExp="formatDate(@festival_date_format,#time_sys)" size="(13 * #sr)" color="@text_color" alpha="#text_alpha" name="date_text" x="#festival_date_text_wrapper_w - (#festival_date_text_wrapper_w - #festival_date_text_template_w) / 2 - #weekday_text.text_width" fontPath="/product/fonts/MiSerifSCVF.ttf" fontPathWeight="500" align="right" alignV="bottom"/>
+          <Text x="(#festival_date_text_wrapper_w - ((#festival_date_text_wrapper_w - #festival_date_text_template_w) / 2))" textExp="(' ' + formatDate(@week_format,#time_sys))" size="(13 * #sr)" color="@primary_color" name="weekday_text" fontFamily="mipro" align="right" alignV="bottom"/>
+        </Group>
+        <Group visibility="#is_rtl">
+          <Text textExp="formatDate(@festival_date_format,#time_sys)" size="(13 * #sr)" color="@text_color" alpha="#text_alpha" name="date_text" x="(#festival_date_text_wrapper_w - #festival_date_text_template_w) / 2 + #weekday_text.text_width" fontPath="/product/fonts/MiSerifSCVF.ttf" fontPathWeight="500" alignV="bottom"/>
+          <Text x="((#festival_date_text_wrapper_w - #festival_date_text_template_w) / 2)" textExp="(' ' + formatDate(@week_format,#time_sys))" size="(13 * #sr)" color="@primary_color" name="weekday_text" fontFamily="mipro" alignV="bottom"/>
+        </Group>
+      </Group>
+      <Group x="(6 * #scaleX)" y="(109 * #scaleY)" visibility="(! #is_horizontal_date)" name="festival_date_vertical_part">
+        <Text textExp="formatDate(@festival_date_format,#time_sys)" size="(11 * #sr)" color="@text_color" alpha="#text_alpha" name="date_text" x="(#festival_date_text_wrapper_w - #date_text.text_width) / 2" fontPath="/product/fonts/MiSerifSCVF.ttf" fontPathWeight="500"/>
+        <Text y="ifelse(#is_BO,(16 * #scaleY),(14 * #scaleY))" textExp="formatDate(@week_format,#time_sys)" size="((11 * #sr) * #second_fes_weekday_text_scale)" color="@primary_color" name="weekday_text" x="(#festival_date_text_wrapper_w - #weekday_text.text_width) / 2" fontFamily="mipro"/>
+      </Group>
+    </Group>
+  </Group>
+  <Group x="#album_x" y="#album_y" w="#album_w" h="#album_h" name="album_part">
+    <Rectangle w="#album_w" h="#album_h" alpha="(255 * #album_bg_alpha)" fillColor="@album_bg_text_color" cornerRadiusExp="(16 * #sr)"/>
+    <Group folmeMode="true" name="img1_wrapper" alpha="0">
+      <Image w="#album_w" h="#album_h" srcX="ifelse(((#img1.bmp_width / #img1.bmp_height) {= (#album_w / #album_h)),0,(0.5 * (#img1.bmp_width - (#img1.bmp_height * (#album_w / #album_h)))))" srcY="ifelse(((#img1.bmp_width / #img1.bmp_height) {= (#album_w / #album_h)),(0.5 * (#img1.bmp_height - (#img1.bmp_width * (#album_h / #album_w)))),0)" srcW="ifelse(((#img1.bmp_width / #img1.bmp_height) {= (#album_w / #album_h)),#img1.bmp_width,(#img1.bmp_height * (#album_w / #album_h)))" srcH="ifelse(((#img1.bmp_width / #img1.bmp_height) {= (#album_w / #album_h)),(#img1.bmp_width * (#album_h / #album_w)),#img1.bmp_height)" cornerRadiusExp="(16 * #sr)" name="img1" loadAsync="true"/>
+    </Group>
+    <Group folmeMode="true" name="img2_wrapper" alpha="0">
+      <Image w="#album_w" h="#album_h" srcX="ifelse(((#img2.bmp_width / #img2.bmp_height) {= (#album_w / #album_h)),0,(0.5 * (#img2.bmp_width - (#img2.bmp_height * (#album_w / #album_h)))))" srcY="ifelse(((#img2.bmp_width / #img2.bmp_height) {= (#album_w / #album_h)),(0.5 * (#img2.bmp_height - (#img2.bmp_width * (#album_h / #album_w)))),0)" srcW="ifelse(((#img2.bmp_width / #img2.bmp_height) {= (#album_w / #album_h)),#img2.bmp_width,(#img2.bmp_height * (#album_w / #album_h)))" srcH="ifelse(((#img2.bmp_width / #img2.bmp_height) {= (#album_w / #album_h)),(#img2.bmp_width * (#album_h / #album_w)),#img2.bmp_height)" cornerRadiusExp="(16 * #sr)" name="img2" loadAsync="true"/>
+    </Group>
+    <Group folmeMode="true" name="load_text" alpha="153">
+      <Text x="(#album_w / 2)" y="(#album_h / 2)" textExp="@text_for_display" size="(13 * #sr)" color="@album_bg_text_color" fontFamily="mipro-medium" align="center" alignV="center"/>
+    </Group>
+  </Group>
+  <Button w="#view_width" h="#view_height" contentDescriptionExp="@content_description">
+    <Triggers>
+      <Trigger action="up">
+        <FunctionCommand target="handleJumpCalendar"/>
+      </Trigger>
+    </Triggers>
+  </Button>
+  <Group>
+    <FolmeState name="folme_state_0" alpha="153"/>
+    <FolmeConfig name="folme_config_0" ease="15, 400" onComplete="'folme_oncomplete_1'"/>
+    <Function name="folme_oncomplete_1">
+      <VariableCommand name="ani_count" expression="0" type="number"/>
+      <FunctionCommand target="on_ani_finish"/>
+    </Function>
+    <FolmeState name="folme_state_1" alpha="0"/>
+    <FolmeConfig name="folme_config_1" ease="15, 300"/>
+    <FolmeState name="folme_state_2" alpha="0"/>
+    <FolmeConfig name="folme_config_2" ease="15, 300"/>
+    <FolmeState name="folme_state_3" alpha="255"/>
+    <FolmeConfig name="folme_config_3" ease="15, 400" onComplete="'folme_oncomplete_4'"/>
+    <Function name="folme_oncomplete_4">
+      <VariableCommand name="ani_count" expression="0" type="number"/>
+      <FunctionCommand target="on_ani_finish"/>
+    </Function>
+    <FolmeState name="folme_state_4" alpha="0"/>
+    <FolmeConfig name="folme_config_4" ease="15, 300"/>
+    <FolmeState name="folme_state_5" alpha="0"/>
+    <FolmeConfig name="folme_config_5" ease="15, 300"/>
+    <FolmeState name="folme_state_6" alpha="0"/>
+    <FolmeConfig name="folme_config_6" ease="15, 300"/>
+    <FolmeState name="folme_state_7" alpha="255"/>
+    <FolmeConfig name="folme_config_7" ease="15, 400" onComplete="'folme_oncomplete_8'"/>
+    <Function name="folme_oncomplete_8">
+      <VariableCommand name="ani_count" expression="0" type="number"/>
+      <FunctionCommand target="on_ani_finish"/>
+    </Function>
+    <FolmeState name="folme_state_8" alpha="0"/>
+    <FolmeConfig name="folme_config_8" ease="15, 300"/>
+  </Group>
+  <VariableBinders>
+    <ContentProviderBinder name="calendarCTA" uriExp="'content://com.miui.calendar/ctaPermission'" columns="is_agree_with_cta">
+      <Variable name="agree_with_cta" column="is_agree_with_cta" type="string"/>
+      <Trigger>
+        <IfCommand ifCondition="eqs(@agree_with_cta,'true')">
+          <Consequent>
+            <VariableCommand name="album_talkback" expression="@talkback_calendar_album" type="string"/>
+            <VariableCommand name="temp_date" expression="formatDate('yyyyMMdd',#time_sys)" type="string"/>
+            <MultiCommand condition="((@cur_date != @temp_date) || (#show_type == (- 1)))">
+              <!-- 刷新前重置：provider 遇 NULL 列不覆盖旧值，若不重置，节日过后残留旧节日名会命中白名单导致 show_type 卡在节日样式切不回。string 类型赋空是类型安全的 -->
+              <VariableCommand name="chinese_festival_name" expression="''" type="string"/>
+              <BinderCommand name="get_lunar_date" command="refresh"/>
+            </MultiCommand>
+            <!-- 仅在没有正在进行的 picture 探测查询时才刷新，避免上一次查询返回前重复刷新导致反复 Cancelled；
+                 每次 resume/配置变化都会重新探测，从而能跟随日历题材变化更新图片 -->
+            <MultiCommand condition="(#img_querying == 0)">
+              <VariableCommand name="img_querying" expression="1" type="number"/>
+              <BinderCommand name="get_image_url" command="refresh"/>
+            </MultiCommand>
+          </Consequent>
+          <Alternate>
+            <VariableCommand name="album_talkback" expression="@cta_text" type="string"/>
+            <VariableCommand name="show_type" expression="(- 1)" type="number"/>
+            <FunctionCommand target="show_text"/>
+          </Alternate>
+        </IfCommand>
+        <VariableCommand name="cur_date" expression="formatDate('yyyyMMdd',#time_sys)" type="string"/>
+      </Trigger>
+    </ContentProviderBinder>
+    <ContentProviderBinder name="get_lunar_date" uriExp="('content://com.miui.calendar/chineseFestivalLunarDate/' + formatFloat('%.0f',#time_sys))" columns="chinese_festival_name">
+      <Variable name="chinese_festival_name" column="chinese_festival_name" type="string"/>
+      <Trigger>
+        <VariableCommand name="set_festival_flag" expression="0" type="number"/>
+        <VariableCommand name="i" type="number" expression="0"/>
+        <LoopCommand loopCondition="((#i { 40) ** eq(#set_festival_flag,0))" count="999">
+          <IfCommand ifCondition="(! strIsEmpty(@chinese_festival_name))">
+            <Consequent>
+              <VariableCommand name="set_festival_flag" expression="1" type="number"/>
+              <VariableCommand name="festival" expression="@chinese_festival_name" type="string"/>
+            </Consequent>
+            <Alternate>
+              <VariableCommand name="festival" expression="''" type="string"/>
+            </Alternate>
+          </IfCommand>
+          <VariableCommand name="i" expression="#i + 1" type="number"/>
+        </LoopCommand>
+        <VariableCommand name="show_type" expression="ifelse(strIsEmpty(@festival),1,2)" type="number"/>
+      </Trigger>
+    </ContentProviderBinder>
+    <ContentProviderBinder name="get_image_url" uriExp="'content://com.miui.calendar/picture'" columns="picture_url" countName="has_pic_url">
+      <Variable name="img_url" column="picture_url" type="string"/>
+      <Trigger>
+        <!-- 查询已返回，清除"进行中"标记，允许下次 resume 重新探测以跟随题材变化 -->
+        <VariableCommand name="img_querying" expression="0" type="number"/>
+        <IfCommand ifCondition="(#has_pic_url } 0)">
+          <Consequent>
+            <!-- 不再用 bmp_width 判断画面是否失效（Rust 运行时下 bitmap 失效时 bmp_width 不一定归零），每次都重新取图。
+                 发起图片请求前统一清空已展示 ID，查到同一图片 ID 时也会重新执行 show_imageN 恢复画面 -->
+            <VariableCommand name="current_displaying_img_id" expression="(- 1)" type="number"/>
+            <IfCommand ifCondition="(! eqs(@img_url,@show_img_url))">
+              <Consequent>
+                <!-- 新图(或文案态后)：载入另一缓冲，由 show_imageN 交叉淡入 -->
+                <IfCommand ifCondition="(#current_top_image != 1)">
+                  <Consequent>
+                    <BinderCommand name="get_image_for_image1" command="refresh"/>
+                  </Consequent>
+                  <Alternate>
+                    <BinderCommand name="get_image_for_image2" command="refresh"/>
+                  </Alternate>
+                </IfCommand>
+              </Consequent>
+              <Alternate>
+                <!-- 同图重取(如 bitmap 被 reparent 回收)：载入当前顶层缓冲而非 ping-pong 到隐藏缓冲，
+                     使可见缓冲拿回 bitmap 直接复现，不做交叉淡入 -->
+                <IfCommand ifCondition="(#current_top_image == 2)">
+                  <Consequent>
+                    <BinderCommand name="get_image_for_image2" command="refresh"/>
+                  </Consequent>
+                  <Alternate>
+                    <BinderCommand name="get_image_for_image1" command="refresh"/>
+                  </Alternate>
+                </IfCommand>
+              </Alternate>
+            </IfCommand>
+          </Consequent>
+          <Alternate>
+            <!-- provider 无当前日期图片(如系统时间被改到题材有效范围外)：走失败处理，
+                 重试若干次后清除旧图并展示"加载失败"，避免旧图常驻 -->
+            <FunctionCommand target="handle_image_fail"/>
+          </Alternate>
+        </IfCommand>
+      </Trigger>
+    </ContentProviderBinder>
+    <ContentProviderBinder name="get_image_for_image1" uriExp="'content://com.miui.calendar/picture'" columns="picture_data,picture_id" countName="has_img_data">
+      <Variable name="img1" column="picture_data" type="blob.bitmap"/>
+      <Variable name="id" column="picture_id" type="number"/>
+      <Trigger>
+        <!-- 图片存在需同时满足：有数据、id 有效、picture_data 有效(解码出位图 has_bitmap)。
+             日历端下载图片失败(如无网)时仍会返回 id>0 但 picture_data 为空，此时走失败重试并显示提示文案。
+             picture_data 为空时 bmp_width 会保留上一张图的值，不能用来判断 -->
+        <IfCommand ifCondition="((#has_img_data } 0) ** (#id } 0) ** (#img1.has_bitmap } 0))">
+          <Consequent>
+            <!-- 加载成功后才提交 url 标记与加载日期，失败/取消时保留旧值以便下次重试 -->
+            <VariableCommand name="show_img_url" expression="@img_url" type="string"/>
+            <VariableCommand name="img_loaded_date" expression="formatDate('yyyyMMdd',#time_sys)" type="string"/>
+            <MultiCommand condition="(#id != #current_displaying_img_id)">
+              <VariableCommand name="current_displaying_img_id" expression="#id" type="number"/>
+              <FunctionCommand target="show_image1"/>
+            </MultiCommand>
+          </Consequent>
+          <Alternate>
+            <!-- 无数据/id无效：走统一失败处理。立即清除旧图并展示"正在加载图片"，
+                 达重试上限才展示"图片加载失败"，修复时间回退/切换无图日期后旧图常驻 -->
+            <FunctionCommand target="handle_image_fail"/>
+          </Alternate>
+        </IfCommand>
+      </Trigger>
+    </ContentProviderBinder>
+    <ContentProviderBinder name="get_image_for_image2" uriExp="'content://com.miui.calendar/picture'" columns="picture_data,picture_id" countName="has_img_data">
+      <Variable name="img2" column="picture_data" type="blob.bitmap"/>
+      <Variable name="id" column="picture_id" type="number"/>
+      <Trigger>
+        <!-- 图片存在需同时满足：有数据、id 有效、picture_data 有效(解码出位图 has_bitmap)。
+             日历端下载图片失败(如无网)时仍会返回 id>0 但 picture_data 为空，此时走失败重试并显示提示文案。
+             picture_data 为空时 bmp_width 会保留上一张图的值，不能用来判断 -->
+        <IfCommand ifCondition="((#has_img_data } 0) ** (#id } 0) ** (#img2.has_bitmap } 0))">
+          <Consequent>
+            <!-- 加载成功后才提交 url 标记与加载日期，失败/取消时保留旧值以便下次重试 -->
+            <VariableCommand name="show_img_url" expression="@img_url" type="string"/>
+            <VariableCommand name="img_loaded_date" expression="formatDate('yyyyMMdd',#time_sys)" type="string"/>
+            <MultiCommand condition="(#id != #current_displaying_img_id)">
+              <VariableCommand name="current_displaying_img_id" expression="#id" type="number"/>
+              <FunctionCommand target="show_image2"/>
+            </MultiCommand>
+          </Consequent>
+          <Alternate>
+            <!-- 无数据/id无效：走统一失败处理。立即清除旧图并展示"正在加载图片"，
+                 达重试上限才展示"图片加载失败"，修复时间回退/切换无图日期后旧图常驻 -->
+            <FunctionCommand target="handle_image_fail"/>
+          </Alternate>
+        </IfCommand>
+      </Trigger>
+    </ContentProviderBinder>
+    <!-- 日历图片下载完成等 Provider 数据变化时，重置重试并重新拉取图片，图片就绪后自动展示 -->
+    <BroadcastBinder action="android.intent.action.PROVIDER_CHANGED" scheme="content">
+      <Variable name="changedProviderHost" type="data.host"/>
+      <Trigger>
+        <IfCommand ifCondition="eqs(@changedProviderHost,'com.miui.calendar') || eqs(@changedProviderHost,'com.android.calendar')">
+          <Consequent>
+            <VariableCommand name="img_retry_count" expression="0" type="number"/>
+            <BinderCommand name="calendarCTA" command="refresh"/>
+          </Consequent>
+        </IfCommand>
+      </Trigger>
+    </BroadcastBinder>
+    <BroadcastBinder action="android.intent.action.CONFIGURATION_CHANGED">
+      <Trigger>
+        <MethodCommand target="__objRoot" targetType="var" method="selfResume"/>
+      </Trigger>
+    </BroadcastBinder>
+  </VariableBinders>
+  <ExternalCommands>
+    <Trigger action="init">
+      <BinderCommand name="calendarCTA" command="refresh"/>
+    </Trigger>
+    <Trigger action="resume">
+      <FunctionCommand target="bind_on_resume"/>
+    </Trigger>
+    <!-- 不监听 orientationChange：该事件仅负一屏派发且 rust maml 不支持，桌面场景本就走不到。
+         旋转/翻折后的图片恢复统一依赖 CONFIGURATION_CHANGED 广播 selfResume → resume → get_image_url
+         每次清空已展示 ID 并重新取图，勿再补回此触发器 -->
+    <Trigger action="pause">
+      <!-- 失焦/被遮挡/堆叠 reparent 前：取消在途淡入并按当前状态 setTo 瞬时锁定各层 alpha，
+           使显示不依赖可能被打断的动画，再次可见时图片已在正确 alpha，避免灰屏/呼吸 -->
+      <FolmeCommand target="img1_wrapper" command="cancel"/>
+      <FolmeCommand target="img2_wrapper" command="cancel"/>
+      <FolmeCommand target="load_text" command="cancel"/>
+      <IfCommand ifCondition="(#current_top_image == 1)">
+        <Consequent>
+          <FolmeCommand target="img1_wrapper" states="'folme_state_3'" command="setTo"/>
+          <FolmeCommand target="img2_wrapper" states="'folme_state_4'" command="setTo"/>
+          <FolmeCommand target="load_text" states="'folme_state_5'" command="setTo"/>
+        </Consequent>
+      </IfCommand>
+      <IfCommand ifCondition="(#current_top_image == 2)">
+        <Consequent>
+          <FolmeCommand target="img1_wrapper" states="'folme_state_6'" command="setTo"/>
+          <FolmeCommand target="img2_wrapper" states="'folme_state_7'" command="setTo"/>
+          <FolmeCommand target="load_text" states="'folme_state_8'" command="setTo"/>
+        </Consequent>
+      </IfCommand>
+      <IfCommand ifCondition="(#current_top_image == (- 1))">
+        <Consequent>
+          <FolmeCommand target="load_text" states="'folme_state_0'" command="setTo"/>
+          <FolmeCommand target="img1_wrapper" states="'folme_state_1'" command="setTo"/>
+          <FolmeCommand target="img2_wrapper" states="'folme_state_2'" command="setTo"/>
+        </Consequent>
+      </IfCommand>
+    </Trigger>
+  </ExternalCommands>
+</Widget>

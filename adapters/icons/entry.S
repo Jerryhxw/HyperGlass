@@ -1,0 +1,56 @@
+.text
+.global entry
+.type entry,%function
+entry:
+ sub x15,x15,#272
+ stp x0,x1,[x15,#0]
+ stp x2,x3,[x15,#16]
+ stp x4,x5,[x15,#32]
+ stp x6,x7,[x15,#48]
+ stp x8,x9,[x15,#64]
+ stp x10,x11,[x15,#80]
+ stp x12,x13,[x15,#96]
+ stp x14,x16,[x15,#112]
+ stp x17,x18,[x15,#128]
+ stp x19,x20,[x15,#144]
+ stp x21,x22,[x15,#160]
+ stp x23,x24,[x15,#176]
+ stp x25,x26,[x15,#192]
+ stp x27,x28,[x15,#208]
+ stp x29,x30,[x15,#224]
+ mov x16,sp
+ str x16,[x15,#240]
+ mov x19,x15
+ mov x0,x1
+ ldur w1,[x0,#0x13]
+ asr w1,w1,#1
+ add x0,x0,#0x17
+ and x16,x15,#-16
+ mov sp,x16
+ bl clear_content
+ mov x15,x19
+ ldr x16,[x15,#240]
+ mov sp,x16
+ ldp x0,x1,[x15,#0]
+ ldp x2,x3,[x15,#16]
+ ldp x4,x5,[x15,#32]
+ ldp x6,x7,[x15,#48]
+ ldp x8,x9,[x15,#64]
+ ldp x10,x11,[x15,#80]
+ ldp x12,x13,[x15,#96]
+ ldp x14,x16,[x15,#112]
+ ldp x17,x18,[x15,#128]
+ ldp x19,x20,[x15,#144]
+ ldp x21,x22,[x15,#160]
+ ldp x23,x24,[x15,#176]
+ ldp x25,x26,[x15,#192]
+ ldp x27,x28,[x15,#208]
+ ldp x29,x30,[x15,#224]
+ add x15,x15,#272
+ stp x22,x22,[x29,#-0x170]
+ stp x22,x22,[x29,#-0x160]
+ stp x22,x22,[x29,#-0x150]
+ stp x22,x22,[x29,#-0x140]
+ stp x22,x22,[x29,#-0x138]
+ mov x0,x22
+ ret

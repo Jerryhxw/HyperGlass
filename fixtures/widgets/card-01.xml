@@ -1,0 +1,633 @@
+<Widget frameRate="0" scaleByDensity="false" screenWidth="1080" version="2" useVariableUpdater="DateTime.Minute" supportBackgroundBlur="false">
+  <Var name="deviceType" type="string" expression="''" const="true"/>
+  <Var name="isPad" type="number" expression="ifelse(eqs(@deviceType,'tablet'),1,0)"/>
+  <Var name="is_ug" type="number" expression="ifelse(eqs(@local,'UG'),1,0)"/>
+  <Var name="scale" type="number" expression="ifelse(#isPad,((#view_height / 160) * 0.9),(#view_height / 160))"/>
+  <Var name="scaleY" type="number" expression="ifelse(#isPad,((#view_height / 160) * 0.9),(#view_height / 160))"/>
+  <Var name="classic_plus_line1_font_size" type="number" expression="ifelse(#is_ug,(15 * #scale),(19 * #scale))"/>
+  <Var name="clock_color" type="string" expression="ifelse((eqs(@isPreviewMode,'true') ** #__darkmode),'#ffffff',ifelse((eqs(@isPreviewMode,'true') ** (! #__darkmode)),'#000000',ifelse(#applied_light_wallpaper,'#000000','#ffffff')))"/>
+  <Var name="isRTL" type="number" expression="ifelse(eqs(@RTL,'0'),0,1)"/>
+  <Var name="isCN" type="number" expression="ifelse(eqs(@local,'CN'),1,0)"/>
+  <Var name="isHK" type="number" expression="ifelse(eqs(@solar_term_local,'HK'),1,0)"/>
+  <Var name="is_dark" type="number" expression="((eqs(@isPreviewMode,'true') ** (! #__darkmode)) || #applied_light_wallpaper)"/>
+  <Var name="use_dark" type="string" expression="ifelse(#is_dark,'_dark','')"/>
+  <Var name="data" type="jsonO" expression="newJsonObject()" const="true"/>
+  <Var name="lock_clockInfo" type="jsonO" expression="newJsonObject()" const="true"/>
+  <Var name="lockInfo" type="string" expression="''" const="true"/>
+  <Var name="lock_templateId" type="string" expression="''" const="true"/>
+  <Var name="lock_line1" type="number" expression="0" const="true"/>
+  <Var name="lock_line2" type="number" expression="0" const="true"/>
+  <Var name="lock_line3" type="number" expression="0" const="true"/>
+  <Var name="lock_font_style" type="number" expression="0" const="true"/>
+  <Var name="lock_font_weight" type="number" expression="0" const="true"/>
+  <Var name="lock_style" type="number" expression="0" const="true"/>
+  <Var name="dummy" type="string" expression="'dummy'" const="true"/>
+  <Var name="timezone_id" type="string" expression="''" const="true"/>
+  <Var name="auto_dual_clock" type="number" expression="0" const="true"/>
+  <Var name="resident_timezone" type="string" expression="''" const="true"/>
+  <Var name="prev_display_dual_clock" type="number" expression="0" const="true"/>
+  <Var name="prev_resident_timezone" type="string" expression="''" const="true"/>
+  <Var name="prev_timezone_id" type="string" expression="''" const="true"/>
+  <Var name="font_path_style_plus" type="string" expression="ifelse((eqs(@lock_templateId,'classic_plus') || (eqs(@lock_templateId,'all_in_one') ** (((#lock_style == 1) || (#lock_style == 2)) || (#lock_style == 3)))),ifelse((#lock_font_style == 21),'etc/MiSansRCF.ttf',ifelse((#lock_font_style == 22),'etc/MiSansRoundedFVF.ttf',ifelse((#lock_font_style == 23),'etc/MiSerifFVF.ttf',ifelse((#lock_font_style == 24),'etc/MiSansSquareFVF.ttf',ifelse((#lock_font_style == 25),'etc/MiHausVF.ttf','etc/MiSansRCF.ttf'))))),'etc/MiSansRCF.ttf')"/>
+  <Var name="font_path_style_classic" type="string" expression="ifelse(eqs(@lock_templateId,'classic'),ifelse((((#lock_font_style == 21) || (#lock_font_style == 22)) || (#lock_font_style == 23)),'/system/fonts/MiSansVF.ttf',ifelse((#lock_font_style == 24),'/product/fonts/MiSansRoundedSC.ttf',ifelse((#lock_font_style == 25),'/product/fonts/BeihaibeiSC-Regular.ttf',ifelse((#lock_font_style == 26),'/product/fonts/MiSerifSCVF.ttf','/system/fonts/MiSansVF.ttf')))),'/system/fonts/MiSansVF.ttf')"/>
+  <Var name="font_path_style_system" type="string" expression="'/system/fonts/MiSansVF.ttf'"/>
+  <Var name="font_path_weight_classic" type="number" expression="ifelse(eqs(@lock_templateId,'classic'),ifelse((#lock_font_style == 21),400,ifelse((#lock_font_style == 22),280,ifelse((#lock_font_style == 23),500,ifelse((#lock_font_style == 24),430,400)))),400)"/>
+  <Var name="weather_type" type="number" expression="0" const="true"/>
+  <Var name="weather_temperature" type="number" expression="0" const="true"/>
+  <Var name="weather_description" type="string" expression="''" const="true"/>
+  <Var name="weather_aqilevel" type="number" expression="0" const="true"/>
+  <Var name="weather_ultraviolet" type="number" expression="0" const="true"/>
+  <Var name="weather_feel_temperature" type="number" expression="0" const="true"/>
+  <Var name="weather_wind" type="string" expression="''" const="true"/>
+  <Var name="weather_humidity" type="number" expression="0" const="true"/>
+  <Var name="weather_pressure" type="number" expression="0" const="true"/>
+  <Var name="weather_next_hour_rain_probability" type="number" expression="0" const="true"/>
+  <Var name="weather_id" type="number" expression="0" const="true"/>
+  <Var name="weather_uvi_desc" type="string" expression="''" const="true"/>
+  <Var name="wind_direction" type="number" expression="0" const="true"/>
+  <Var name="wind_power" type="number" expression="0" const="true"/>
+  <Var name="weather_wind_direction" type="string" expression="''" const="true"/>
+  <Var name="weather_wind_power" type="number" expression="0" const="true"/>
+  <Var name="hasweather" type="number" expression="0" const="true"/>
+  <Var name="humidityIndex" type="number" expression="0" const="true"/>
+  <Var name="_humidityIndex" type="number" expression="0" const="true"/>
+  <Var name="midnight_x" type="number" expression="ifelse((((#lock_font_style == 22) || (#lock_font_style == 24)) || (#lock_font_style == 25)),(129 * #scale),(127 * #scale))"/>
+  <Var name="midnight_y" type="number" expression="ifelse((#lock_font_style == 22),(36 * #scaleY),ifelse(((#lock_font_style == 24) || (#lock_font_style == 25)),(37 * #scaleY),(35 * #scaleY)))"/>
+  <Var name="zero_x" type="number" expression="(26 * #scale)"/>
+  <Var name="zero_y" type="number" expression="ifelse((#lock_font_style == 22),(35 * #scaleY),ifelse(((#lock_font_style == 24) || (#lock_font_style == 25)),(37 * #scaleY),(34 * #scaleY)))"/>
+  <Var name="dawn_x" type="number" expression="(38 * #scale)"/>
+  <Var name="dawn_y" type="number" expression="ifelse((#lock_font_style == 22),(30 * #scaleY),ifelse((#lock_font_style == 23),(28 * #scaleY),ifelse(((#lock_font_style == 24) || (#lock_font_style == 25)),(32 * #scaleY),(29 * #scaleY))))"/>
+  <Var name="sunrise_x" type="number" expression="ifelse((#lock_font_style == 23),(21 * #scale),ifelse(((#lock_font_style == 24) || (#lock_font_style == 25)),(25 * #scale),(22 * #scale)))"/>
+  <Var name="sunrise_y" type="number" expression="ifelse((((#lock_font_style == 23) || (#lock_font_style == 24)) || (#lock_font_style == 25)),(19 * #scaleY),(20 * #scaleY))"/>
+  <Var name="morning_x" type="number" expression="ifelse((((#lock_font_style == 23) || (#lock_font_style == 24)) || (#lock_font_style == 25)),(35 * #scale),(34 * #scale))"/>
+  <Var name="morning_y" type="number" expression="ifelse((#lock_font_style == 22),(11 * #scaleY),ifelse((#lock_font_style == 23),(8 * #scaleY),(10 * #scaleY)))"/>
+  <Var name="noon_x" type="number" expression="(50 * #scale)"/>
+  <Var name="noon_y" type="number" expression="ifelse((#lock_font_style == 23),(5 * #scaleY),(6 * #scaleY))"/>
+  <Var name="afternoon_x" type="number" expression="(65 * #scale)"/>
+  <Var name="afternoon_y" type="number" expression="(10 * #scaleY)"/>
+  <Var name="sunset_x" type="number" expression="(105 * #scale)"/>
+  <Var name="sunset_y" type="number" expression="(20 * #scaleY)"/>
+  <Var name="night_x" type="number" expression="(116 * #scale)"/>
+  <Var name="night_y" type="number" expression="ifelse((#lock_font_style == 24),(31 * #scaleY),(29 * #scaleY))"/>
+  <Var name="weather_sunrise" type="number" expression="0" const="true"/>
+  <Var name="weather_sunset" type="number" expression="0" const="true"/>
+  <Var name="sunrise_time" type="number" expression="0" const="true"/>
+  <Var name="sunset_time" type="number" expression="0" const="true"/>
+  <Var name="sunrise_morning" type="string" expression="'0'" const="true"/>
+  <Var name="sunset_night" type="string" expression="'0'" const="true"/>
+  <Var name="has_sunset" type="number" expression="0" const="true"/>
+  <Var name="day_or_night" type="string" expression="''" const="true"/>
+  <Var name="day_or_night_talkback" type="string" expression="''" const="true"/>
+  <Var name="if_tomorrow" type="number" expression="0" const="true"/>
+  <Var name="sun_x" type="number" expression="0" const="true"/>
+  <Var name="sun_y" type="number" expression="0" const="true"/>
+  <Var name="time0" type="number" expression="(int(((((#time_sys - (#hour24 * 3600000)) - (#minute * 60000)) - (#second * 1000)) / 1000)) * 1000)"/>
+  <Var name="time24" type="number" expression="(#time0 + 86400000)"/>
+  <Var name="time12" type="number" expression="(#time0 + (86400000 / 2))"/>
+  <Var name="hashourlydata" type="string" expression="''" const="true"/>
+  <Var name="hasSteps" type="number" expression="0" const="true"/>
+  <Var name="mi_step" type="number" expression="0" const="true"/>
+  <Var name="mi_steps_goal" type="number" expression="0" const="true"/>
+  <Var name="hasStand" type="number" expression="0" const="true"/>
+  <Var name="mi_stand" type="number" expression="0" const="true"/>
+  <Var name="mi_stand_goal" type="number" expression="0" const="true"/>
+  <Var name="easy_date" type="string" expression="ifelse(#is_ug,formatDate('E dd',#time_sys),formatDate('dd E',#time_sys))"/>
+  <Var name="easy_date_talkback" type="string" expression="formatDate(ifelse(#isCN,'dd日 E','EEEE d'),#time_sys)"/>
+  <Var name="solar_term" type="string" expression="formatDate('t',#time_sys)"/>
+  <Var name="solarTermsStr" type="string[]" values="@slight_cold,@great_cold,@spring_begins,@the_rains,@insects_awaken,@vernal_equinox,@clear_and_bright,@grain_rain,@summer_begins,@grain_buds,@grain_in_ear,@summer_solstice,@slight_heat,@great_heat,@autumn_begins,@stopping_the_heat,@white_dews,@autumn_equinox,@cold_dews,@hoar_frost_falls,@winter_begins,@light_snow,@heavy_snow,@winter_solstice"/>
+  <Var name="solar_term_map" type="string[]" values="'','小寒','大寒','立春','雨水','惊蛰','春分','清明','谷雨','立夏','小满','芒种','夏至','小暑','大暑','立秋','处暑','白露','秋分','寒露','霜降','立冬','小雪','大雪','冬至'"/>
+  <Var name="solar_term_index" type="number" expression="0" const="true"/>
+  <Var name="final_solar_term" type="string" expression="ifelse(#isHK,@solar_term,@solar_term_map[#solar_term_index])"/>
+  <Var name="trunk_branch_lunar_solar" type="string" expression="ifelse(strIsEmpty(@solar_term),'YY年 N月e',('N月e ' + @final_solar_term))"/>
+  <Var name="date_lunar_solar" type="string" expression="formatDate(ifelse(#isCN,'M月d日E N月et',@time_format_100),#time_sys)"/>
+  <Var name="isZH" type="number" expression="ifelse(((eqs(@local,'CN') || eqs(@local,'HK')) || eqs(@local,'TW')),1,0)"/>
+  <Var name="date_format_100" type="string" expression="formatDate(ifelse(#isZH,'M月d日 E',@time_format_100),#time_sys)"/>
+  <Var name="classic_plus_text" type="string" expression="ifelse((#lock_line2 == 100),@date_format_100,ifelse((#lock_line2 == 101),formatDate(@trunk_branch_lunar_solar,#time_sys),ifelse((#lock_line2 == 400),(((ifelse(#hasweather,#weather_temperature,'--') + '°') + ' ') + ifelse(#hasweather,@weather_description,'')),ifelse((#lock_line2 == 401),(('AQI' + ' ') + ifelse((#hasweather ** (#weather_aqilevel != (- 1))),#weather_aqilevel,'--')),ifelse((#lock_line2 == 404),ifelse(#hasweather,@day_or_night,'日出 --:--'),ifelse((#lock_line2 == 405),(((('UVI' + ' ') + ifelse(#hasweather,#weather_ultraviolet,'--')) + ' ') + ifelse(#hasweather,@weather_uvi_desc,'')),ifelse((#lock_line2 == 406),(((@weather_feel_like_temperature + ' ') + ifelse(#hasweather,#weather_feel_temperature,'--')) + '°'),ifelse((#lock_line2 == 407),ifelse(#hasweather,((@weather_wind_direction + ifelse(eqs(@local,'US'),' | ',' ')) + strReplaceAll(@weather_wind_level_unit,'wind',#weather_wind_power)),''),ifelse((#lock_line2 == 408),(((@weather_humidity_percent + ' ') + ifelse(#hasweather,#weather_humidity,'--')) + '%'),ifelse((#lock_line2 == 500),ifelse(#hasSteps,#mi_step,'--'),ifelse((#lock_line2 == 504),ifelse(#hasSteps,#mi_stand,'--'),@date_lunar_solar)))))))))))"/>
+  <Var name="classic_plus_text_talkback" type="string" expression="ifelse(((! #hasweather) ** (((((((#lock_line2 == 400) || (#lock_line2 == 401)) || (#lock_line2 == 404)) || (#lock_line2 == 405)) || (#lock_line2 == 406)) || (#lock_line2 == 407)) || (#lock_line2 == 408))),((@easy_date_talkback + ' ') + @no_weather_data_talkback),ifelse(((! #hasSteps) ** ((#lock_line2 == 500) || (#lock_line2 == 504))),((@easy_date_talkback + ' ') + @no_health_dataTalkback),ifelse((#lock_line2 == 100),formatDate(ifelse(#isCN,'M月d日 E',@time_format_100_talkback),#time_sys),ifelse((#lock_line2 == 101),formatDate(@trunk_branch_lunar_solar,#time_sys),ifelse((#lock_line2 }= 400),((@easy_date_talkback + ' ') + ifelse((#lock_line2 == 400),((ifelse(eqs(@local,'CN'),strReplaceAll(@weather_temperature_talkback,'temperature',#weather_temperature),@weather_temperature_talkback) + ' ') + @weather_description),ifelse((#lock_line2 == 401),ifelse((#weather_aqilevel != (- 1)),ifelse(eqs(@local,'CN'),strReplaceAll(@air_quality_index_talkback,'SLOT_VAL',#weather_aqilevel),@air_quality_index_talkback),@air_quality_index_null_talkback),ifelse((#lock_line2 == 404),@day_or_night_talkback,ifelse((#lock_line2 == 405),((ifelse(eqs(@local,'CN'),strReplaceAll(@weather_ultraviolet_index_talkback,'ultraviolet',#weather_ultraviolet),@weather_ultraviolet_index_talkback) + ',') + @weather_uvi_desc),ifelse((#lock_line2 == 406),ifelse(eqs(@local,'CN'),strReplaceAll(@weather_feel_like_temperature_talkback,'feellike',#weather_feel_temperature),@weather_feel_like_temperature_talkback),ifelse((#lock_line2 == 407),((@weather_wind_direction + ' ') + strReplaceAll(@weather_wind_level_unit,'wind',#weather_wind_power)),ifelse((#lock_line2 == 408),(((@weather_humidity_percent_talkback + ' ') + #weather_humidity) + '%'),ifelse((#lock_line2 == 500),((ifelse(eqs(@local,'CN'),strReplaceAll(@step_walked_current_talkback,'current',#mi_step),@step_walked_current_talkback) + ',') + ifelse(eqs(@local,'CN'),strReplaceAll(@step_walked_goal_talkback,'goal',#mi_steps_goal),@step_walked_goal_talkback)),ifelse((#lock_line2 == 504),((ifelse(eqs(@local,'CN'),strReplaceAll(@stand_walked_current_talkback,'current',#mi_stand),@stand_walked_current_talkback) + ',') + ifelse(eqs(@local,'CN'),strReplaceAll(@stand_walked_goal_talkback,'goal',#mi_stand_goal),@stand_walked_goal_talkback)),'')))))))))),@date_lunar_solar)))))"/>
+  <Var name="left_city_name" type="string" expression="''" const="true"/>
+  <Var name="dual_clock_right_zone_id" type="string" expression="''" const="true"/>
+  <Var name="dual_clock_right_zone_displayname" type="string" expression="''" const="true"/>
+  <Var name="dual_clock_right_zone_timename" type="string" expression="''" const="true"/>
+  <Var name="dual_clock_left_zone_id" type="string" expression="''" const="true"/>
+  <Var name="auto_time_zone" type="string" expression="''" const="true"/>
+  <Var name="dual_clock_left_zone_timename" type="string" expression="''" const="true"/>
+  <Var name="dual_clock_enable" type="number" expression="0" const="true"/>
+  <Var name="dual_clock_right_zone_time_offset" type="number" expression="0" const="true"/>
+  <Var name="dual_clock_left_zone_time_offset" type="number" expression="0" const="true"/>
+  <Var name="dual_zone_info_uri" type="string" expression="'dummy'" const="true"/>
+  <Var name="hasRightZone" type="string" expression="''" const="true"/>
+  <Var name="zone_info_uri" type="string" expression="'dummy'" const="true"/>
+  <Var name="hasLeftZone" type="string" expression="''" const="true"/>
+  <Var name="solarTermState" expression="(! eqs(@solar_term,@solar_term_map[#solar_term_index]))" threshold="1">
+    <Trigger>
+      <FunctionCommand target="get_solar_term_index"/>
+    </Trigger>
+  </Var>
+  <FramerateController name="frame" initPause="1" loop="0">
+    <ControlPoint frameRate="10" time="0"/>
+    <ControlPoint frameRate="10" time="400"/>
+    <ControlPoint frameRate="0" time="401"/>
+  </FramerateController>
+  <Var name="display_dual_clock" type="number" expression="ifelse((#auto_dual_clock ** (! eqs(@timezone_id,@resident_timezone))),1,0)"/>
+  <Var name="hour_origin" type="number" expression="ifelse(#time_format,#hour24,#hour12)"/>
+  <Var name="hour_mapping" type="string" expression="ifelse((#hour_origin == 0),'零',ifelse((#hour_origin == 1),'一',ifelse((#hour_origin == 2),'二',ifelse((#hour_origin == 3),'三',ifelse((#hour_origin == 4),'四',ifelse((#hour_origin == 5),'五',ifelse((#hour_origin == 6),'六',ifelse((#hour_origin == 7),'七',ifelse((#hour_origin == 8),'八',ifelse((#hour_origin == 9),'九',ifelse((#hour_origin == 10),'十',ifelse((#hour_origin == 11),'十一',ifelse((#hour_origin == 12),'十二',ifelse((#hour_origin == 13),'十三',ifelse((#hour_origin == 14),'十四',ifelse((#hour_origin == 15),'十五',ifelse((#hour_origin == 16),'十六',ifelse((#hour_origin == 17),'十七',ifelse((#hour_origin == 18),'十八',ifelse((#hour_origin == 19),'十九',ifelse((#hour_origin == 20),'二十',ifelse((#hour_origin } 20),(('二' + ifelse((((#minute == 0) || (#lock_line1 == 304)) || (#lock_line2 == 304)),'十','')) + ifelse((#hour_origin == 21),'一',ifelse((#hour_origin == 22),'二',ifelse((#hour_origin == 23),'三',ifelse((#hour_origin == 24),'四','一'))))),'零'))))))))))))))))))))))"/>
+  <Var name="minute_mapping" type="string" expression="ifelse((#minute == 0),'零',ifelse((#minute { 10),('零' + ifelse((#minute == 1),'一',ifelse((#minute == 2),'二',ifelse((#minute == 3),'三',ifelse((#minute == 4),'四',ifelse((#minute == 5),'五',ifelse((#minute == 6),'六',ifelse((#minute == 7),'七',ifelse((#minute == 8),'八','九'))))))))),ifelse((#minute == 10),'十',ifelse((#minute { 20),('十' + ifelse((#minute == 11),'一',ifelse((#minute == 12),'二',ifelse((#minute == 13),'三',ifelse((#minute == 14),'四',ifelse((#minute == 15),'五',ifelse((#minute == 16),'六',ifelse((#minute == 17),'七',ifelse((#minute == 18),'八','九'))))))))),ifelse((#minute == 20),'二十',ifelse((#minute { 30),(('二' + ifelse(((#hour_origin } 10) ** ((#lock_line1 == 301) || (#lock_line2 == 301))),'','十')) + ifelse((#minute == 21),'一',ifelse((#minute == 22),'二',ifelse((#minute == 23),'三',ifelse((#minute == 24),'四',ifelse((#minute == 25),'五',ifelse((#minute == 26),'六',ifelse((#minute == 27),'七',ifelse((#minute == 28),'八','九'))))))))),ifelse((#minute == 30),'三十',ifelse((#minute { 40),(('三' + ifelse(((#hour_origin } 10) ** ((#lock_line1 == 301) || (#lock_line2 == 301))),'','十')) + ifelse((#minute == 31),'一',ifelse((#minute == 32),'二',ifelse((#minute == 33),'三',ifelse((#minute == 34),'四',ifelse((#minute == 35),'五',ifelse((#minute == 36),'六',ifelse((#minute == 37),'七',ifelse((#minute == 38),'八','九'))))))))),ifelse((#minute == 40),'四十',ifelse((#minute { 50),(('四' + ifelse(((#hour_origin } 10) ** ((#lock_line1 == 301) || (#lock_line2 == 301))),'','十')) + ifelse((#minute == 41),'一',ifelse((#minute == 42),'二',ifelse((#minute == 43),'三',ifelse((#minute == 44),'四',ifelse((#minute == 45),'五',ifelse((#minute == 46),'六',ifelse((#minute == 47),'七',ifelse((#minute == 48),'八','九'))))))))),ifelse((#minute == 50),'五十',(('五' + ifelse(((#hour_origin } 10) ** ((#lock_line1 == 301) || (#lock_line2 == 301))),'','十')) + ifelse((#minute == 51),'一',ifelse((#minute == 52),'二',ifelse((#minute == 53),'三',ifelse((#minute == 54),'四',ifelse((#minute == 55),'五',ifelse((#minute == 56),'六',ifelse((#minute == 57),'七',ifelse((#minute == 58),'八','九'))))))))))))))))))))"/>
+  <Var name="month_mapping" type="string" expression="ifelse((#month1 == 1),'一',ifelse((#month1 == 2),'二',ifelse((#month1 == 3),'三',ifelse((#month1 == 4),'四',ifelse((#month1 == 5),'五',ifelse((#month1 == 6),'六',ifelse((#month1 == 7),'七',ifelse((#month1 == 8),'八',ifelse((#month1 == 9),'九',ifelse((#month1 == 10),'十',ifelse((#month1 == 11),'十一','十二')))))))))))"/>
+  <Var name="date_mapping" type="string" expression="ifelse((#date == 1),'一',ifelse((#date == 2),'二',ifelse((#date == 3),'三',ifelse((#date == 4),'四',ifelse((#date == 5),'五',ifelse((#date == 6),'六',ifelse((#date == 7),'七',ifelse((#date == 8),'八',ifelse((#date == 9),'九',ifelse((#date == 10),'十',ifelse((#date { 20),('十' + ifelse((#date == 11),'一',ifelse((#date == 12),'二',ifelse((#date == 13),'三',ifelse((#date == 14),'四',ifelse((#date == 15),'五',ifelse((#date == 16),'六',ifelse((#date == 17),'七',ifelse((#date == 18),'八','九'))))))))),ifelse((#date == 20),'二十',ifelse((#date { 30),('二十' + ifelse((#date == 21),'一',ifelse((#date == 22),'二',ifelse((#date == 23),'三',ifelse((#date == 24),'四',ifelse((#date == 25),'五',ifelse((#date == 26),'六',ifelse((#date == 27),'七',ifelse((#date == 28),'八','九'))))))))),ifelse((#date == 30),'三十','三十一'))))))))))))))"/>
+  <Function name="refreshTimezoneId">
+    <MethodCommand target="timezone_obj" targetType="var" class="java.util.TimeZone" method="getDefault" returnType="object" return="timezone_obj"/>
+    <MethodCommand target="timezone_obj" targetType="var" method="getID" returnType="string" return="timezone_id"/>
+  </Function>
+  <Function name="requestData">
+    <FunctionCommand target="refreshTimezoneId"/>
+    <BinderCommand name="settings" command="refresh"/>
+  </Function>
+  <Function name="get_solar_term_index">
+    <VariableCommand name="i" type="number" expression="0"/>
+    <LoopCommand loopCondition="(#i { 24)" count="999">
+      <MultiCommand condition="eqs(@solar_term,@solarTermsStr[#i])">
+        <VariableCommand name="solar_term_index" expression="(#i + 1)" type="number"/>
+      </MultiCommand>
+      <VariableCommand name="i" expression="#i + 1" type="number"/>
+    </LoopCommand>
+  </Function>
+  <Function name="openClassicLine2App">
+    <MultiCommand condition="((#lock_line2 }= 0) ** (#lock_line2 {= 305))">
+      <IfCommand ifCondition="((#lock_line2 }= 200) ** (#lock_line2 {= 212))">
+        <Consequent>
+          <FunctionCommand target="openCalendar"/>
+        </Consequent>
+        <Alternate>
+          <FunctionCommand target="openClock"/>
+        </Alternate>
+      </IfCommand>
+    </MultiCommand>
+    <MultiCommand condition="((#lock_line2 }= 400) ** (#lock_line2 {= 409))">
+      <FunctionCommand target="openWeather"/>
+    </MultiCommand>
+    <MultiCommand condition="(#lock_line2 }= 500)">
+      <FunctionCommand target="openHealth"/>
+    </MultiCommand>
+  </Function>
+  <Function name="openClassicLine3App">
+    <MultiCommand condition="((#lock_line3 }= 0) ** (#lock_line3 {= 305))">
+      <IfCommand ifCondition="((#lock_line3 }= 200) ** (#lock_line3 {= 212))">
+        <Consequent>
+          <FunctionCommand target="openCalendar"/>
+        </Consequent>
+        <Alternate>
+          <FunctionCommand target="openClock"/>
+        </Alternate>
+      </IfCommand>
+    </MultiCommand>
+    <MultiCommand condition="((#lock_line3 }= 400) ** (#lock_line3 {= 409))">
+      <FunctionCommand target="openWeather"/>
+    </MultiCommand>
+    <MultiCommand condition="(#lock_line3 }= 500)">
+      <FunctionCommand target="openHealth"/>
+    </MultiCommand>
+  </Function>
+  <Function name="openPlusApp">
+    <MultiCommand condition="((#lock_line2 == 0) || ((#lock_line2 }= 100) ** (#lock_line2 {= 103)))">
+      <FunctionCommand target="openCalendar"/>
+    </MultiCommand>
+    <MultiCommand condition="((#lock_line2 }= 400) ** (#lock_line2 {= 408))">
+      <FunctionCommand target="openWeather"/>
+    </MultiCommand>
+    <MultiCommand condition="(#lock_line2 }= 500)">
+      <FunctionCommand target="openHealth"/>
+    </MultiCommand>
+  </Function>
+  <Function name="openCalendar">
+    <IntentCommand action="com.android.calendar.main.views" package="com.android.calendar" class="com.android.calendar.AllInOneActivity" uriExp="'content://com.android.calendar/view/4'" disableMotionAnim="true"/>
+  </Function>
+  <Function name="openClock">
+    <IntentCommand action="android.intent.action.MAIN" package="com.android.deskclock" class="com.android.deskclock.DeskClockTabActivity" disableMotionAnim="true"/>
+  </Function>
+  <Function name="openWeather">
+    <IntentCommand action="android.intent.action.MAIN" package="com.miui.weather2" class="com.miui.weather2.ActivityWeatherMain" disableMotionAnim="true"/>
+  </Function>
+  <Function name="openHealth">
+    <IntentCommand action="com.mi.health.action.ROUTER" package="com.mi.health" disableMotionAnim="true"/>
+  </Function>
+  <Group visibility="#display_dual_clock">
+    <!-- DualClock.vue -->
+    <Var name="sc_w_Fr9AgPfG" type="number" expression="(#view_width / 344)"/>
+    <Var name="sc_h_Fr9AgPfG" type="number" expression="(#view_height / 160)"/>
+    <Var name="sc_Fr9AgPfG" type="number" expression="ifelse((#sc_w_Fr9AgPfG { #sc_h_Fr9AgPfG),#sc_w_Fr9AgPfG,#sc_h_Fr9AgPfG)"/>
+    <Var name="offset_x_Fr9AgPfG" type="number" expression="((#view_width - (344 * #sc_Fr9AgPfG)) / 2)"/>
+    <Var name="clock_color_Fr9AgPfG" type="string" expression="ifelse((eqs(@isPreviewMode,'true') ** #__darkmode),'#ffffff',ifelse((eqs(@isPreviewMode,'true') ** (! #__darkmode)),'#000000',ifelse(#applied_light_wallpaper,'#000000','#ffffff')))"/>
+    <Var name="date_format_Fr9AgPfG" type="string" expression="ifelse(#time_format,@dual_clock_date_time,@dual_clock_date_time_12)"/>
+    <Var name="dual_clock_city_name_left_Fr9AgPfG" type="string" expression="ifelse(len(@dual_clock_left_zone_timename),@dual_clock_left_zone_timename,ifelse((eqs(@auto_time_zone,'true') ** len(@left_city_name)),@left_city_name,@dual_clock_location))"/>
+    <Var name="dual_clock_city_name_right_Fr9AgPfG" type="string" expression="ifelse(len(@dual_clock_right_zone_timename),@dual_clock_right_zone_timename,ifelse(len(@dual_clock_right_zone_displayname),@dual_clock_right_zone_displayname,@dual_clock_resident_city))"/>
+    <Var name="date_font_size_Fr9AgPfG" type="number" expression="(14 * #sc_Fr9AgPfG)"/>
+    <Var name="time_font_size_Fr9AgPfG" type="number" expression="(58 * #sc_Fr9AgPfG)"/>
+    <Var name="zone_font_size_Fr9AgPfG" type="number" expression="(14 * #sc_Fr9AgPfG)"/>
+    <Var name="left_col_center_x_Fr9AgPfG" type="number" expression="(#offset_x_Fr9AgPfG + (80.5 * #sc_Fr9AgPfG))"/>
+    <Var name="right_col_center_x_Fr9AgPfG" type="number" expression="(#offset_x_Fr9AgPfG + (263 * #sc_Fr9AgPfG))"/>
+    <Var name="column_width_Fr9AgPfG" type="number" expression="(148 * #sc_Fr9AgPfG)"/>
+    <Var name="left_col_x_Fr9AgPfG" type="number" expression="(#left_col_center_x_Fr9AgPfG - (#column_width_Fr9AgPfG / 2))"/>
+    <Var name="right_col_x_Fr9AgPfG" type="number" expression="(#right_col_center_x_Fr9AgPfG - (#column_width_Fr9AgPfG / 2))"/>
+    <Var name="time_y_Fr9AgPfG" type="number" expression="(#view_height / 2)"/>
+    <Var name="date_y_Fr9AgPfG" type="number" expression="((#view_height / 2) - (38.5 * #sc_Fr9AgPfG))"/>
+    <Var name="zone_y_Fr9AgPfG" type="number" expression="((#view_height / 2) + (38.5 * #sc_Fr9AgPfG))"/>
+    <Function name="openCalendar">
+      <IntentCommand action="com.android.calendar.main.views" package="com.android.calendar" class="com.android.calendar.AllInOneActivity" uriExp="'content://com.android.calendar/view/4'" disableMotionAnim="true"/>
+    </Function>
+    <Function name="openClock">
+      <IntentCommand action="android.intent.action.MAIN" package="com.android.deskclock" class="com.android.deskclock.DeskClockTabActivity" disableMotionAnim="true">
+        <Extra name="navigation_tab" type="int" expression="0"/>
+      </IntentCommand>
+    </Function>
+    <Function name="openClockWorldTab">
+      <IntentCommand action="android.intent.action.MAIN" package="com.android.deskclock" class="com.android.deskclock.DeskClockTabActivity" disableMotionAnim="true">
+        <Extra name="navigation_tab" type="int" expression="1"/>
+      </IntentCommand>
+    </Function>
+    <Group w="#view_width" h="#view_height">
+      <Group x="ifelse(#isRTL,#right_col_x_Fr9AgPfG,#left_col_x_Fr9AgPfG)" w="#column_width_Fr9AgPfG" h="#view_height">
+        <DateTime x="(#column_width_Fr9AgPfG / 2)" y="#date_y_Fr9AgPfG" color="@clock_color_Fr9AgPfG" size="#date_font_size_Fr9AgPfG" formatExp="@date_format_Fr9AgPfG" timeZoneId="@dual_clock_left_zone_id" contentDescriptionFormatExp="((@dual_clock_city_name_left_Fr9AgPfG + ' ') + @date_format_Fr9AgPfG)" touchable="true" name="dual_clock_leftDate" align="center" alignV="center" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="450">
+          <Triggers>
+            <Trigger action="up">
+              <FunctionCommand target="openCalendar"/>
+            </Trigger>
+          </Triggers>
+        </DateTime>
+        <DateTime x="(#column_width_Fr9AgPfG / 2)" y="#time_y_Fr9AgPfG" color="@clock_color_Fr9AgPfG" size="#time_font_size_Fr9AgPfG" formatExp="ifelse(#time_format,'H:mm','h:mm')" timeZoneId="@dual_clock_left_zone_id" contentDescriptionFormatExp="((@dual_clock_city_name_left_Fr9AgPfG + ' ') + ifelse(#time_format,'H:mm','h:mm'))" touchable="true" name="dual_clock_leftTime" fontPath="etc/MiSansRCF.ttf" fontPathWeight="380" align="center" alignV="center">
+          <Triggers>
+            <Trigger action="up">
+              <FunctionCommand target="openClock"/>
+            </Trigger>
+          </Triggers>
+        </DateTime>
+        <Text x="(#column_width_Fr9AgPfG / 2)" y="#zone_y_Fr9AgPfG" w="#column_width_Fr9AgPfG" color="@clock_color_Fr9AgPfG" size="#zone_font_size_Fr9AgPfG" textExp="@dual_clock_city_name_left_Fr9AgPfG" name="dual_clock_leftZone" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="380" align="center" alignV="center" ellipsis="true"/>
+      </Group>
+      <Group x="ifelse(#isRTL,#left_col_x_Fr9AgPfG,#right_col_x_Fr9AgPfG)" w="#column_width_Fr9AgPfG" h="#view_height">
+        <DateTime x="(#column_width_Fr9AgPfG / 2)" y="#date_y_Fr9AgPfG" color="@clock_color_Fr9AgPfG" size="#date_font_size_Fr9AgPfG" formatExp="@date_format_Fr9AgPfG" timeZoneId="@dual_clock_right_zone_id" contentDescriptionFormatExp="((@dual_clock_city_name_right_Fr9AgPfG + ' ') + @date_format_Fr9AgPfG)" touchable="true" name="dual_clock_rightDate" align="center" alignV="center" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="450">
+          <Triggers>
+            <Trigger action="up">
+              <FunctionCommand target="openCalendar"/>
+            </Trigger>
+          </Triggers>
+        </DateTime>
+        <DateTime x="(#column_width_Fr9AgPfG / 2)" y="#time_y_Fr9AgPfG" color="@clock_color_Fr9AgPfG" size="#time_font_size_Fr9AgPfG" formatExp="ifelse(#time_format,'H:mm','h:mm')" timeZoneId="@dual_clock_right_zone_id" contentDescriptionFormatExp="((@dual_clock_city_name_right_Fr9AgPfG + ' ') + ifelse(#time_format,'H:mm','h:mm'))" touchable="true" name="dual_clock_rightTime" fontPath="etc/MiSansRCF.ttf" fontPathWeight="380" align="center" alignV="center">
+          <Triggers>
+            <Trigger action="up">
+              <FunctionCommand target="openClockWorldTab"/>
+            </Trigger>
+          </Triggers>
+        </DateTime>
+        <Text x="(#column_width_Fr9AgPfG / 2)" y="#zone_y_Fr9AgPfG" w="#column_width_Fr9AgPfG" color="@clock_color_Fr9AgPfG" size="#zone_font_size_Fr9AgPfG" textExp="@dual_clock_city_name_right_Fr9AgPfG" name="dual_clock_rightZone" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="380" align="center" alignV="center" ellipsis="true"/>
+      </Group>
+      <Button x="ifelse(#isRTL,(#view_width / 2),0)" w="(#view_width / 2)" h="#view_height" y="0">
+        <Triggers>
+          <Trigger action="up">
+            <FunctionCommand target="openClock"/>
+          </Trigger>
+        </Triggers>
+      </Button>
+      <Button x="ifelse(#isRTL,0,(#view_width / 2))" w="(#view_width / 2)" h="#view_height" y="0">
+        <Triggers>
+          <Trigger action="up">
+            <FunctionCommand target="openClockWorldTab"/>
+          </Trigger>
+        </Triggers>
+      </Button>
+    </Group>
+  </Group>
+  <Group visibility="(! #display_dual_clock)">
+    <Group visibility="eqs(@lock_templateId,'classic')">
+      <!-- ClassicClock.vue -->
+      <Var name="temperature_unit_font_size_AjE9RjwZ" type="number" expression="(30 * #scale)"/>
+      <Var name="is_bo_AjE9RjwZ" type="number" expression="ifelse(eqs(@local,'BO'),1,0)"/>
+      <Var name="is_th_AjE9RjwZ" type="number" expression="ifelse(eqs(@local,'TH'),1,0)"/>
+      <Var name="is_ug_AjE9RjwZ" type="number" expression="ifelse(eqs(@local,'UG'),1,0)"/>
+      <Var name="is_ar_AjE9RjwZ" type="number" expression="ifelse(eqs(@local,'AR'),1,0)"/>
+      <Var name="line1_text_margin_AjE9RjwZ" type="number" expression="ifelse((#lock_font_style == 25),(- 7.2),ifelse((((#lock_line1 == 301) || (#lock_line1 == 304)) || (#lock_line1 == 305)),(- 8.2),(- 10.4)))"/>
+      <Var name="line2_text_margin_AjE9RjwZ" type="number" expression="ifelse((#is_bo_AjE9RjwZ ** (((((#lock_line2 == 201) || (#lock_line2 == 203)) || (#lock_line2 == 204)) || (#lock_line2 == 206)) || (#lock_line2 == 207))),(- 10),ifelse((#lock_font_style == 25),(- 7.2),ifelse(((((((#lock_line2 == 301) || (#lock_line2 == 304)) || (#lock_line2 == 305)) || (#lock_line2 == 211)) || (#lock_line2 == 212)) || (#isCN ** ((((((#lock_line2 == 201) || (#lock_line2 == 203)) || (#lock_line2 == 204)) || (#lock_line2 == 206)) || (#lock_line2 == 207)) || (#lock_line2 == 208)))),(- 8.2),(- 10.4))))"/>
+      <Var name="line2_text_margin_2_AjE9RjwZ" type="number" expression="ifelse((#lock_font_style == 25),(- 7.2),ifelse(((((((#lock_line2 == 301) || (#lock_line2 == 304)) || (#lock_line2 == 305)) || (#lock_line2 == 211)) || (#lock_line2 == 212)) || (#isCN ** ((((((#lock_line2 == 201) || (#lock_line2 == 203)) || (#lock_line2 == 204)) || (#lock_line2 == 206)) || (#lock_line2 == 207)) || (#lock_line2 == 208)))),(- 8.2),(- 10.4)))"/>
+      <Var name="line3_text_margin_AjE9RjwZ" type="number" expression="ifelse((#is_bo_AjE9RjwZ ** (((((#lock_line3 == 201) || (#lock_line3 == 203)) || (#lock_line3 == 204)) || (#lock_line3 == 206)) || (#lock_line3 == 207))),(- 12),ifelse((#lock_font_style == 25),(- 7.2),ifelse(((((((#lock_line3 == 301) || (#lock_line3 == 304)) || (#lock_line3 == 305)) || (#lock_line3 == 211)) || (#lock_line3 == 212)) || (#isCN ** ((((((#lock_line3 == 201) || (#lock_line3 == 203)) || (#lock_line3 == 204)) || (#lock_line3 == 206)) || (#lock_line3 == 207)) || (#lock_line3 == 208)))),(- 8.2),(- 10.4))))"/>
+      <Var name="line3_text_margin_2_AjE9RjwZ" type="number" expression="ifelse((#lock_font_style == 25),(- 7.2),ifelse(((((((#lock_line3 == 301) || (#lock_line3 == 304)) || (#lock_line3 == 305)) || (#lock_line3 == 211)) || (#lock_line3 == 212)) || (#isCN ** ((((((#lock_line3 == 201) || (#lock_line3 == 203)) || (#lock_line3 == 204)) || (#lock_line3 == 206)) || (#lock_line3 == 207)) || (#lock_line3 == 208)))),(- 8.2),(- 10.4)))"/>
+      <Var name="is_dark_AjE9RjwZ" type="number" expression="((eqs(@isPreviewMode,'true') ** (! #__darkmode)) || #applied_light_wallpaper)"/>
+      <Var name="use_dark_AjE9RjwZ" type="string" expression="ifelse(#is_dark_AjE9RjwZ,'_dark','')"/>
+      <Var name="corner_text_font_weight_AjE9RjwZ" type="number" expression="380"/>
+      <Var name="line1_fontsize_AjE9RjwZ" type="number" expression="ifelse((#lock_font_style == 25),(48 * #scale),ifelse((((#lock_line1 == 301) || (#lock_line1 == 304)) || (#lock_line1 == 305)),(46.2 * #scale),ifelse((#is_ar_AjE9RjwZ || #is_ug_AjE9RjwZ),((51.2 * 0.75) * #scale),ifelse((#isRTL || #is_th_AjE9RjwZ),((51.2 * 0.9) * #scale),(51.2 * #scale)))))"/>
+      <Var name="line2_fontsize_AjE9RjwZ" type="number" expression="ifelse((#is_ug_AjE9RjwZ ** (((((#lock_line2 == 201) || (#lock_line2 == 203)) || (#lock_line2 == 204)) || (#lock_line2 == 206)) || (#lock_line2 == 207))),((51.2 * 0.75) * #scale),ifelse((#is_bo_AjE9RjwZ ** (((((#lock_line2 == 201) || (#lock_line2 == 203)) || (#lock_line2 == 204)) || (#lock_line2 == 206)) || (#lock_line2 == 207))),((51.2 * 0.7) * #scale),ifelse((#lock_font_style == 25),(48 * #scale),ifelse(((((((#lock_line2 == 301) || (#lock_line2 == 304)) || (#lock_line2 == 305)) || (#lock_line2 == 211)) || (#lock_line2 == 212)) || (#isCN ** ((((((#lock_line2 == 201) || (#lock_line2 == 203)) || (#lock_line2 == 204)) || (#lock_line2 == 206)) || (#lock_line2 == 207)) || (#lock_line2 == 208)))),(46.2 * #scale),ifelse((#is_ar_AjE9RjwZ || #is_ug_AjE9RjwZ),((51.2 * 0.75) * #scale),ifelse((#isRTL || #is_th_AjE9RjwZ),((51.2 * 0.9) * #scale),(51.2 * #scale)))))))"/>
+      <Var name="line3_fontsize_AjE9RjwZ" type="number" expression="ifelse((#is_ug_AjE9RjwZ ** (((((#lock_line3 == 201) || (#lock_line3 == 203)) || (#lock_line3 == 204)) || (#lock_line3 == 206)) || (#lock_line3 == 207))),((51.2 * 0.75) * #scale),ifelse((#is_bo_AjE9RjwZ ** (((((#lock_line3 == 201) || (#lock_line3 == 203)) || (#lock_line3 == 204)) || (#lock_line3 == 206)) || (#lock_line3 == 207))),((51.2 * 0.7) * #scale),ifelse((#lock_font_style == 25),(48 * #scale),ifelse(((((((#lock_line3 == 301) || (#lock_line3 == 304)) || (#lock_line3 == 305)) || (#lock_line3 == 211)) || (#lock_line3 == 212)) || (#isCN ** ((((((#lock_line3 == 201) || (#lock_line3 == 203)) || (#lock_line3 == 204)) || (#lock_line3 == 206)) || (#lock_line3 == 207)) || (#lock_line3 == 208)))),(46.2 * #scale),ifelse((#is_ar_AjE9RjwZ || #is_ug_AjE9RjwZ),((51.2 * 0.75) * #scale),ifelse((#isRTL || #is_th_AjE9RjwZ),((51.2 * 0.9) * #scale),(51.2 * #scale)))))))"/>
+      <Var name="isCircle_AjE9RjwZ" type="number" expression="((#lock_font_style == 24) || (#lock_font_style == 25))"/>
+      <Var name="suffix_AjE9RjwZ" type="string" expression="ifelse(#isCircle_AjE9RjwZ,ifelse(#is_dark_AjE9RjwZ,'circle_dark','circle'),ifelse(#is_dark_AjE9RjwZ,'straight_dark','straight'))"/>
+      <Var name="feel_temperature_image_src_AjE9RjwZ" type="string" expression="ifelse((! #hasweather),(('assets/feel_temperature/placeholder_' + @suffix_AjE9RjwZ) + '.png'),ifelse((#weather_feel_temperature { 13),(('assets/feel_temperature/cold_' + @suffix_AjE9RjwZ) + '.png'),ifelse((#weather_feel_temperature { 29),(('assets/feel_temperature/comfort_' + @suffix_AjE9RjwZ) + '.png'),ifelse((#weather_feel_temperature }= 29),(('assets/feel_temperature/hot_' + @suffix_AjE9RjwZ) + '.png'),''))))"/>
+      <Var name="isRuleLine2_AjE9RjwZ" type="number" expression="(((((#lock_line2 == 200) || (#lock_line2 == 202)) || (#lock_line2 == 209)) || (#lock_line2 == 210)) || ((! #isCN) ** ((#lock_line2 == 201) || (#lock_line2 == 203))))"/>
+      <Var name="isRuleLine2_left_AjE9RjwZ" type="string" expression="strToUpperCase(formatDate(ifelse(((! #isCN) ** ((#lock_line2 == 201) || (#lock_line2 == 203))),'MMM','M'),#time_sys))"/>
+      <Var name="isRuleLine3_AjE9RjwZ" type="number" expression="(((((#lock_line3 == 200) || (#lock_line3 == 202)) || (#lock_line3 == 209)) || (#lock_line3 == 210)) || ((! #isCN) ** ((#lock_line3 == 201) || (#lock_line3 == 203))))"/>
+      <Var name="isRuleLine3_left_AjE9RjwZ" type="string" expression="strToUpperCase(formatDate(ifelse(((! #isCN) ** ((#lock_line3 == 201) || (#lock_line3 == 203))),'MMM','M'),#time_sys))"/>
+      <Var name="time0_AjE9RjwZ" type="number" expression="(int(((((#time_sys - (#hour24 * 3600000)) - (#minute * 60000)) - (#second * 1000)) / 1000)) * 1000)"/>
+      <Var name="weather_wind_direction_image_AjE9RjwZ" type="number" expression="ifelse(((#wind_direction }= 337.5) || (#wind_direction { 22.25)),0,ifelse(((#wind_direction }= 22.25) ** (#wind_direction { 67.5)),1,ifelse(((#wind_direction }= 67.5) ** (#wind_direction { 112.5)),2,ifelse(((#wind_direction }= 112.5) ** (#wind_direction { 157.5)),3,ifelse(((#wind_direction }= 157.5) ** (#wind_direction { 202.5)),4,ifelse(((#wind_direction }= 202.5) ** (#wind_direction { 247.5)),5,ifelse(((#wind_direction }= 247.5) ** (#wind_direction { 292.5)),6,7)))))))"/>
+      <Var name="weather_pressure_image_AjE9RjwZ" type="string" expression="ifelse((#weather_pressure } 1013.25),'up','down')"/>
+      <Var name="defaultTimeFormat_AjE9RjwZ" type="string" expression="formatDate(ifelse(#time_format,'HH:mm','h:mm'),#time_sys)"/>
+      <Var name="ifMinute_AjE9RjwZ" type="string" expression="ifelse(((((#hour_origin }= 0) ** (#hour_origin {= 10)) ** (((((#minute }= 10) ** (#minute {= 20)) || (#minute == 30)) || (#minute == 40)) || (#minute == 50))) || (((#hour_origin }= 11) ** (#hour_origin {= 24)) ** (#minute == 10))),'分','')"/>
+      <Var name="ifHour_AjE9RjwZ" type="string" expression="ifelse(#isHK,'時','时')"/>
+      <Var name="classic_text_line1_AjE9RjwZ" type="string" expression="ifelse((#lock_line1 == 300),@defaultTimeFormat_AjE9RjwZ,ifelse((#lock_line1 == 301),ifelse((#minute == 0),((@hour_mapping + @ifHour_AjE9RjwZ) + '整'),(((@hour_mapping + @ifHour_AjE9RjwZ) + @minute_mapping) + @ifMinute_AjE9RjwZ)),ifelse((#lock_line1 == 302),formatDate(ifelse(#time_format,'HH','hh'),#time_sys),ifelse((#lock_line1 == 303),formatDate(ifelse(#time_format,'mm','mm'),#time_sys),ifelse((#lock_line1 == 304),(@hour_mapping + @ifHour_AjE9RjwZ),ifelse((#lock_line1 == 305),(@minute_mapping + '分'),@defaultTimeFormat_AjE9RjwZ))))))"/>
+      <Var name="classic_text_line1_talkback_AjE9RjwZ" type="string" expression="ifelse((#lock_line1 == 300),@defaultTimeFormat_AjE9RjwZ,ifelse((#lock_line1 == 301),ifelse((#minute == 0),((@hour_mapping + @ifHour_AjE9RjwZ) + '整'),(((@hour_mapping + @ifHour_AjE9RjwZ) + @minute_mapping) + @ifMinute_AjE9RjwZ)),ifelse((#lock_line1 == 302),(formatDate(ifelse(#time_format,'HH','hh'),#time_sys) + '时'),ifelse((#lock_line1 == 303),(formatDate(ifelse(#time_format,'mm','mm'),#time_sys) + '分'),ifelse((#lock_line1 == 304),(@hour_mapping + @ifHour_AjE9RjwZ),ifelse((#lock_line1 == 305),(@minute_mapping + '分'),@defaultTimeFormat_AjE9RjwZ))))))"/>
+      <Var name="classic_text_line_line2_sub_AjE9RjwZ" type="string" expression="ifelse((#lock_line2 == 204),strToUpperCase(formatDate('d',#time_sys)),'')"/>
+      <Var name="classic_text_line_line3_sub_AjE9RjwZ" type="string" expression="ifelse((#lock_line3 == 204),strToUpperCase(formatDate('d',#time_sys)),'')"/>
+      <Var name="classic_text_line_line2_AjE9RjwZ" type="string" expression="ifelse((#lock_line2 == 300),@defaultTimeFormat_AjE9RjwZ,ifelse((#lock_line2 == 301),ifelse((#minute == 0),((@hour_mapping + @ifHour_AjE9RjwZ) + '整'),(((@hour_mapping + @ifHour_AjE9RjwZ) + @minute_mapping) + @ifMinute_AjE9RjwZ)),ifelse((#lock_line2 == 302),formatDate(ifelse(#time_format,'HH','hh'),#time_sys),ifelse((#lock_line2 == 303),formatDate(ifelse(#time_format,'mm','mm'),#time_sys),ifelse((#lock_line2 == 304),(@hour_mapping + @ifHour_AjE9RjwZ),ifelse((#lock_line2 == 305),(@minute_mapping + '分'),ifelse(((#lock_line2 == 201) || (#lock_line2 == 203)),formatDate('M月d日',#time_sys),ifelse((#lock_line2 == 204),strToUpperCase(formatDate('E',#time_sys)),ifelse((#lock_line2 == 205),formatDate('d',#time_sys),ifelse((#lock_line2 == 206),strToUpperCase(formatDate('E',#time_sys)),ifelse((#lock_line2 == 207),ifelse(#isCN,(@month_mapping + '月'),strToUpperCase(formatDate('MMM',#time_sys))),ifelse((#lock_line2 == 208),ifelse(#isCN,(@date_mapping + '日'),formatDate('d',#time_sys)),ifelse((#lock_line2 == 211),ifelse(strIsEmpty(@solar_term),formatDate('N月e',#time_sys),@final_solar_term),ifelse((#lock_line2 == 212),formatDate('YY年',#time_sys),ifelse((#lock_line2 == 400),ifelse(#hasweather,#weather_temperature,'-'),ifelse((#lock_line2 == 401),ifelse((#hasweather ** (#weather_aqilevel != (- 1))),#weather_aqilevel,'--'),ifelse((#lock_line2 == 402),ifelse(#hasweather,#weather_next_hour_rain_probability,'--'),ifelse((#lock_line2 == 405),ifelse(#hasweather,#weather_ultraviolet,'--'),ifelse((#lock_line2 == 407),ifelse(#hasweather,#weather_wind_power,'--'),ifelse((#lock_line2 == 409),ifelse(#hasweather,#weather_pressure,'--'),ifelse((#lock_line2 == 500),ifelse(#hasSteps,#mi_step,'--'),ifelse((#lock_line2 == 504),ifelse(#hasSteps,#mi_stand,'--'),ifelse((((#lock_line2 == 408) || (#lock_line2 == 403)) || (#lock_line2 == 406)),'',formatDate('M/d',#time_sys))))))))))))))))))))))))"/>
+      <Var name="lock_line2_day_right_top_AjE9RjwZ" type="string" expression="ifelse((((eqs(@classic_text_line_line2_AjE9RjwZ,'1') || eqs(@classic_text_line_line2_AjE9RjwZ,'11')) || eqs(@classic_text_line_line2_AjE9RjwZ,'21')) || eqs(@classic_text_line_line2_AjE9RjwZ,'31')),'ST',ifelse(((eqs(@classic_text_line_line2_AjE9RjwZ,'2') || eqs(@classic_text_line_line2_AjE9RjwZ,'12')) || eqs(@classic_text_line_line2_AjE9RjwZ,'22')),'ND',ifelse((eqs(@classic_text_line_line2_AjE9RjwZ,'3') || eqs(@classic_text_line_line2_AjE9RjwZ,'13')),'RD','TH')))"/>
+      <Var name="classic_text_line_line2_top_AjE9RjwZ" type="string" expression="ifelse(((((#lock_line2 == 202) || (#lock_line2 == 210)) || (#lock_line2 == 203)) || (#lock_line2 == 205)),strToUpperCase(formatDate('E',#time_sys)),ifelse((#lock_line2 == 208),ifelse(#isCN,'',@lock_line2_day_right_top_AjE9RjwZ),ifelse((#lock_line2 == 209),formatDate('N月e',#time_sys),ifelse((#lock_line2 == 211),ifelse(strIsEmpty(@solar_term),'',formatDate('N月e',#time_sys)),ifelse((#lock_line2 == 401),'AQI',ifelse((#lock_line2 == 402),'%',ifelse((#lock_line2 == 405),'UVI',ifelse((#lock_line2 == 406),(ifelse(#hasweather,#weather_feel_temperature,'--') + '°'),ifelse((#lock_line2 == 407),ifelse(#hasweather,ifelse(#isCN,substr(@weather_wind_direction,0,2),@weather_wind_direction),''),ifelse((#lock_line2 == 409),'hPa',ifelse((#lock_line2 == 408),(ifelse(#hasweather,#weather_humidity,'--') + '%'),'')))))))))))"/>
+      <Var name="classic_text_line_line2_bottom_AjE9RjwZ" type="string" expression="ifelse((#lock_line2 == 210),ifelse(strIsEmpty(@solar_term),formatDate('N月e',#time_sys),@final_solar_term),ifelse(((#lock_line2 == 203) || (#lock_line2 == 209)),@final_solar_term,ifelse((#lock_line2 == 404),formatDate('N月e',#time_sys),ifelse((#lock_line2 == 405),ifelse(#hasweather,@weather_uvi_desc,''),ifelse((#lock_line2 == 500),((ifelse((! #is_ug_AjE9RjwZ),'/','') + ifelse(#hasSteps,#mi_steps_goal,'--')) + ifelse(#is_ug_AjE9RjwZ,'/','')),ifelse((#lock_line2 == 504),((ifelse((! #is_ug_AjE9RjwZ),'/','') + ifelse(#hasSteps,#mi_stand_goal,'--')) + ifelse(#is_ug_AjE9RjwZ,'/','')),''))))))"/>
+      <Var name="classic_text_line2_talkback_AjE9RjwZ" type="string" expression="ifelse(((! #hasweather) ** (((((((((#lock_line2 == 400) || (#lock_line2 == 401)) || (#lock_line2 == 402)) || (#lock_line2 == 403)) || (#lock_line2 == 405)) || (#lock_line2 == 406)) || (#lock_line2 == 407)) || (#lock_line2 == 408)) || (#lock_line2 == 409))),@no_weather_data_talkback,ifelse(((! #hasSteps) ** ((#lock_line2 == 500) || (#lock_line2 == 504))),@no_health_dataTalkback,ifelse((#lock_line2 == 300),@defaultTimeFormat_AjE9RjwZ,ifelse((#lock_line2 == 301),ifelse((#minute == 0),((@hour_mapping + @ifHour_AjE9RjwZ) + '整'),(((@hour_mapping + @ifHour_AjE9RjwZ) + @minute_mapping) + @ifMinute_AjE9RjwZ)),ifelse((#lock_line2 == 302),(formatDate(ifelse(#time_format,'HH','hh'),#time_sys) + '时'),ifelse((#lock_line2 == 303),(formatDate('mm',#time_sys) + '分'),ifelse((#lock_line2 == 304),(@hour_mapping + @ifHour_AjE9RjwZ),ifelse((#lock_line2 == 305),(@minute_mapping + '分'),ifelse(((#lock_line2 == 200) || (#lock_line2 == 201)),formatDate(ifelse(#isCN,'M月d日','MMMM d'),#time_sys),ifelse(((#lock_line2 == 202) || (#lock_line2 == 203)),formatDate(ifelse(#isCN,'M月d日 E','MMMM d EEEE'),#time_sys),ifelse((#lock_line2 == 204),ifelse(#isCN,formatDate('E d日',#time_sys),(((formatDate('EEEE',#time_sys) + ',') + @day_of_the_month_talkback) + formatDate('d',#time_sys))),ifelse((#lock_line2 == 205),ifelse(#isCN,formatDate('d日 E',#time_sys),(((@day_of_the_month_talkback + formatDate('d',#time_sys)) + ',') + formatDate('EEEE',#time_sys))),ifelse((#lock_line2 == 206),formatDate(ifelse(#isCN,'E','EEEE'),#time_sys),ifelse((#lock_line2 == 207),ifelse(#isCN,(@month_mapping + '月'),formatDate('MMMM',#time_sys)),ifelse((#lock_line2 == 208),ifelse(#isCN,(@date_mapping + '日'),(@day_of_the_month_talkback + formatDate('d',#time_sys))),ifelse((#lock_line2 == 209),ifelse(#isCN,formatDate(((((('M月d日' + ',') + '农历') + 'N月e') + ',') + 't'),#time_sys),(((((formatDate('MMMM d',#time_sys) + ',') + @date_according_to_the_traditional_chinese_calendar) + formatDate('N月e',#time_sys)) + ',') + ifelse((! strIsEmpty(@solar_term)),(@holiday_talkback + @final_solar_term),''))),ifelse((#lock_line2 == 210),ifelse(#isCN,formatDate((('M月d日 E' + ',') + ifelse(strIsEmpty(@solar_term),('农历' + 'N月e'),'t')),#time_sys),((formatDate('MMMM d EEEE',#time_sys) + ',') + ifelse(strIsEmpty(@solar_term),(@date_according_to_the_traditional_chinese_calendar + formatDate('N月e',#time_sys)),(@holiday_talkback + @final_solar_term)))),ifelse((#lock_line2 == 211),formatDate('t N月e',#time_sys),ifelse((#lock_line2 == 212),formatDate('YY年',#time_sys),ifelse((#lock_line2 == 400),((strReplaceAll(@weather_temperature_talkback,'temperature',#weather_temperature) + ' ') + @weather_description),ifelse((#lock_line2 == 401),ifelse((#weather_aqilevel != (- 1)),strReplaceAll(@air_quality_index_talkback,'SLOT_VAL',#weather_aqilevel),@air_quality_index_null_talkback),ifelse((#lock_line2 == 402),(((@chance_of_precipitation_talkback + ' ') + #weather_next_hour_rain_probability) + '%'),ifelse((#lock_line2 == 403),@day_or_night_talkback,ifelse((#lock_line2 == 405),((strReplaceAll(@weather_ultraviolet_index_talkback,'ultraviolet',#weather_ultraviolet) + ',') + @weather_uvi_desc),ifelse((#lock_line2 == 406),strReplaceAll(@weather_feel_like_temperature_talkback,'feellike',#weather_feel_temperature),ifelse((#lock_line2 == 407),((@weather_wind_direction + ' ') + strReplaceAll(@weather_wind_level_unit,'wind',#weather_wind_power)),ifelse((#lock_line2 == 408),(((@weather_humidity_percent_talkback + ' ') + #weather_humidity) + '%'),ifelse((#lock_line2 == 409),strReplaceAll(@weather_pressure_hectopascal_talkback,'SLOT_VAL',#weather_pressure),ifelse((#lock_line2 == 500),((ifelse(eqs(@local,'CN'),strReplaceAll(@step_walked_current_talkback,'current',#mi_step),@step_walked_current_talkback) + ',') + ifelse(eqs(@local,'CN'),strReplaceAll(@step_walked_goal_talkback,'goal',#mi_steps_goal),@step_walked_goal_talkback)),ifelse((#lock_line2 == 504),((ifelse(eqs(@local,'CN'),strReplaceAll(@step_walked_goal_talkback,'goal',#mi_steps_goal),@step_walked_goal_talkback) + ',') + ifelse(eqs(@local,'CN'),strReplaceAll(@stand_walked_goal_talkback,'goal',#mi_stand_goal),@stand_walked_goal_talkback)),formatDate('M/d',#time_sys)))))))))))))))))))))))))))))))"/>
+      <Var name="classic_text_line_line3_AjE9RjwZ" type="string" expression="ifelse((#lock_line3 == 300),@defaultTimeFormat_AjE9RjwZ,ifelse((#lock_line3 == 301),ifelse((#minute == 0),((@hour_mapping + @ifHour_AjE9RjwZ) + '整'),(((@hour_mapping + @ifHour_AjE9RjwZ) + @minute_mapping) + @ifMinute_AjE9RjwZ)),ifelse((#lock_line3 == 302),formatDate(ifelse(#time_format,'HH','hh'),#time_sys),ifelse((#lock_line3 == 303),formatDate(ifelse(#time_format,'mm','mm'),#time_sys),ifelse((#lock_line3 == 304),(@hour_mapping + @ifHour_AjE9RjwZ),ifelse((#lock_line3 == 305),(@minute_mapping + '分'),ifelse(((#lock_line3 == 201) || (#lock_line3 == 203)),formatDate('M月d日',#time_sys),ifelse((#lock_line3 == 204),strToUpperCase(formatDate('E',#time_sys)),ifelse((#lock_line3 == 205),formatDate('d',#time_sys),ifelse((#lock_line3 == 206),strToUpperCase(formatDate('E',#time_sys)),ifelse((#lock_line3 == 207),ifelse(#isCN,(@month_mapping + '月'),strToUpperCase(formatDate('MMM',#time_sys))),ifelse((#lock_line3 == 208),ifelse(#isCN,(@date_mapping + '日'),formatDate('d',#time_sys)),ifelse((#lock_line3 == 211),ifelse(strIsEmpty(@solar_term),formatDate('N月e',#time_sys),@final_solar_term),ifelse((#lock_line3 == 212),formatDate('YY年',#time_sys),ifelse((#lock_line3 == 400),ifelse(#hasweather,#weather_temperature,'-'),ifelse((#lock_line3 == 401),ifelse((#hasweather ** (#weather_aqilevel != (- 1))),#weather_aqilevel,'--'),ifelse((#lock_line3 == 402),ifelse(#hasweather,#weather_next_hour_rain_probability,'--'),ifelse((#lock_line3 == 405),ifelse(#hasweather,#weather_ultraviolet,'--'),ifelse((#lock_line3 == 407),ifelse(#hasweather,#weather_wind_power,'--'),ifelse((#lock_line3 == 409),ifelse(#hasweather,#weather_pressure,'--'),ifelse((#lock_line3 == 500),ifelse(#hasSteps,#mi_step,'--'),ifelse((#lock_line3 == 504),ifelse(#hasSteps,#mi_stand,'--'),ifelse((((#lock_line3 == 408) || (#lock_line3 == 403)) || (#lock_line3 == 406)),'',formatDate('M/d',#time_sys))))))))))))))))))))))))"/>
+      <Var name="lock_line3_day_right_top_AjE9RjwZ" type="string" expression="ifelse((((eqs(@classic_text_line_line3_AjE9RjwZ,'1') || eqs(@classic_text_line_line3_AjE9RjwZ,'11')) || eqs(@classic_text_line_line3_AjE9RjwZ,'21')) || eqs(@classic_text_line_line3_AjE9RjwZ,'31')),'ST',ifelse(((eqs(@classic_text_line_line3_AjE9RjwZ,'2') || eqs(@classic_text_line_line3_AjE9RjwZ,'12')) || eqs(@classic_text_line_line3_AjE9RjwZ,'22')),'ND',ifelse((eqs(@classic_text_line_line3_AjE9RjwZ,'3') || eqs(@classic_text_line_line3_AjE9RjwZ,'13')),'RD','TH')))"/>
+      <Var name="classic_text_line_line3_top_AjE9RjwZ" type="string" expression="ifelse(((((#lock_line3 == 202) || (#lock_line3 == 210)) || (#lock_line3 == 203)) || (#lock_line3 == 205)),strToUpperCase(formatDate('E',#time_sys)),ifelse((#lock_line3 == 208),ifelse(#isCN,'',@lock_line3_day_right_top_AjE9RjwZ),ifelse((#lock_line3 == 209),formatDate('N月e',#time_sys),ifelse((#lock_line3 == 211),ifelse(strIsEmpty(@solar_term),'',formatDate('N月e',#time_sys)),ifelse((#lock_line3 == 401),'AQI',ifelse((#lock_line3 == 402),'%',ifelse((#lock_line3 == 405),'UVI',ifelse((#lock_line3 == 406),(ifelse(#hasweather,#weather_feel_temperature,'--') + '°'),ifelse((#lock_line3 == 407),ifelse(#hasweather,ifelse(#isCN,substr(@weather_wind_direction,0,2),@weather_wind_direction),''),ifelse((#lock_line3 == 409),'hPa',ifelse((#lock_line3 == 408),(ifelse(#hasweather,#weather_humidity,'--') + '%'),'')))))))))))"/>
+      <Var name="classic_text_line_line3_bottom_AjE9RjwZ" type="string" expression="ifelse((#lock_line3 == 210),ifelse(strIsEmpty(@solar_term),formatDate('N月e',#time_sys),@final_solar_term),ifelse(((#lock_line3 == 203) || (#lock_line3 == 209)),@final_solar_term,ifelse((#lock_line3 == 404),formatDate('N月e',#time_sys),ifelse((#lock_line3 == 405),ifelse(#hasweather,@weather_uvi_desc,''),ifelse((#lock_line3 == 500),((ifelse((! #is_ug_AjE9RjwZ),'/','') + ifelse(#hasSteps,#mi_steps_goal,'--')) + ifelse(#is_ug_AjE9RjwZ,'/','')),ifelse((#lock_line3 == 504),((ifelse((! #is_ug_AjE9RjwZ),'/','') + ifelse(#hasSteps,#mi_stand_goal,'--')) + ifelse(#is_ug_AjE9RjwZ,'/','')),''))))))"/>
+      <Var name="classic_text_line3_talkback_AjE9RjwZ" type="string" expression="ifelse(((! #hasweather) ** (((((((((#lock_line3 == 400) || (#lock_line3 == 401)) || (#lock_line3 == 402)) || (#lock_line3 == 403)) || (#lock_line3 == 405)) || (#lock_line3 == 406)) || (#lock_line3 == 407)) || (#lock_line3 == 408)) || (#lock_line3 == 409))),@no_weather_data_talkback,ifelse(((! #hasSteps) ** ((#lock_line3 == 500) || (#lock_line3 == 504))),@no_health_dataTalkback,ifelse((#lock_line3 == 300),@defaultTimeFormat_AjE9RjwZ,ifelse((#lock_line3 == 301),ifelse((#minute == 0),((@hour_mapping + @ifHour_AjE9RjwZ) + '整'),(((@hour_mapping + @ifHour_AjE9RjwZ) + @minute_mapping) + @ifMinute_AjE9RjwZ)),ifelse((#lock_line3 == 302),(formatDate(ifelse(#time_format,'HH','hh'),#time_sys) + '时'),ifelse((#lock_line3 == 303),(formatDate('mm',#time_sys) + '分'),ifelse((#lock_line3 == 304),(@hour_mapping + @ifHour_AjE9RjwZ),ifelse((#lock_line3 == 305),(@minute_mapping + '分'),ifelse(((#lock_line3 == 200) || (#lock_line3 == 201)),formatDate(ifelse(#isCN,'M月d日','MMMM d'),#time_sys),ifelse(((#lock_line3 == 202) || (#lock_line3 == 203)),formatDate(ifelse(#isCN,'M月d日 E','MMMM d EEEE'),#time_sys),ifelse((#lock_line3 == 204),ifelse(#isCN,formatDate('E d日',#time_sys),(((formatDate('EEEE',#time_sys) + ',') + @day_of_the_month_talkback) + formatDate('d',#time_sys))),ifelse((#lock_line3 == 205),ifelse(#isCN,formatDate('d日 E',#time_sys),(((@day_of_the_month_talkback + formatDate('d',#time_sys)) + ',') + formatDate('EEEE',#time_sys))),ifelse((#lock_line3 == 206),formatDate(ifelse(#isCN,'E','EEEE'),#time_sys),ifelse((#lock_line3 == 207),ifelse(#isCN,(@month_mapping + '月'),formatDate('MMMM',#time_sys)),ifelse((#lock_line3 == 208),ifelse(#isCN,(@date_mapping + '日'),(@day_of_the_month_talkback + formatDate('d',#time_sys))),ifelse((#lock_line3 == 209),ifelse(#isCN,formatDate(((((('M月d日' + ',') + '农历') + 'N月e') + ',') + 't'),#time_sys),(((((formatDate('MMMM d',#time_sys) + ',') + @date_according_to_the_traditional_chinese_calendar) + formatDate('N月e',#time_sys)) + ',') + ifelse((! strIsEmpty(@solar_term)),(@holiday_talkback + @final_solar_term),''))),ifelse((#lock_line3 == 210),ifelse(#isCN,formatDate((('M月d日 E' + ',') + ifelse(strIsEmpty(@solar_term),('农历' + 'N月e'),'t')),#time_sys),((formatDate('MMMM d EEEE',#time_sys) + ',') + ifelse(strIsEmpty(@solar_term),(@date_according_to_the_traditional_chinese_calendar + formatDate('N月e',#time_sys)),(@holiday_talkback + @final_solar_term)))),ifelse((#lock_line3 == 211),formatDate('t N月e',#time_sys),ifelse((#lock_line3 == 212),formatDate('YY年',#time_sys),ifelse((#lock_line3 == 400),((strReplaceAll(@weather_temperature_talkback,'temperature',#weather_temperature) + ' ') + @weather_description),ifelse((#lock_line3 == 401),ifelse((#weather_aqilevel != (- 1)),strReplaceAll(@air_quality_index_talkback,'SLOT_VAL',#weather_aqilevel),@air_quality_index_null_talkback),ifelse((#lock_line3 == 402),(((@chance_of_precipitation_talkback + ' ') + #weather_next_hour_rain_probability) + '%'),ifelse((#lock_line3 == 403),@day_or_night_talkback,ifelse((#lock_line3 == 405),((strReplaceAll(@weather_ultraviolet_index_talkback,'ultraviolet',#weather_ultraviolet) + ',') + @weather_uvi_desc),ifelse((#lock_line3 == 406),strReplaceAll(@weather_feel_like_temperature_talkback,'feellike',#weather_feel_temperature),ifelse((#lock_line3 == 407),((@weather_wind_direction + ' ') + strReplaceAll(@weather_wind_level_unit,'wind',#weather_wind_power)),ifelse((#lock_line3 == 408),(((@weather_humidity_percent_talkback + ' ') + #weather_humidity) + '%'),ifelse((#lock_line3 == 409),strReplaceAll(@weather_pressure_hectopascal_talkback,'SLOT_VAL',#weather_pressure),ifelse((#lock_line3 == 500),((ifelse(eqs(@local,'CN'),strReplaceAll(@step_walked_current_talkback,'current',#mi_step),@step_walked_current_talkback) + ',') + ifelse(eqs(@local,'CN'),strReplaceAll(@step_walked_goal_talkback,'goal',#mi_steps_goal),@step_walked_goal_talkback)),ifelse((#lock_line3 == 504),((ifelse(eqs(@local,'CN'),strReplaceAll(@stand_walked_current_talkback,'current',#mi_stand),@stand_walked_current_talkback) + ',') + ifelse(eqs(@local,'CN'),strReplaceAll(@stand_walked_goal_talkback,'goal',#mi_stand_goal),@stand_walked_goal_talkback)),formatDate('M/d',#time_sys)))))))))))))))))))))))))))))))"/>
+      <Group x="ifelse(#isRTL,((- 5) * #scale),(5 * #scale))">
+        <Group y="(8 * #scaleY)">
+          <Text x="ifelse(#isRTL,(#view_width - #classic_clock_line1.text_width),0)" y="(#line1_text_margin_AjE9RjwZ * #scaleY)" size="#line1_fontsize_AjE9RjwZ" fontPath="@font_path_style_classic" fontPathWeight="#font_path_weight_classic" color="@clock_color" textExp="@classic_text_line1_AjE9RjwZ" name="classic_clock_line1"/>
+          <Button x="ifelse(#isRTL,0,((- 5) * #scale))" w="#view_width" h="(56 * #scaleY)" contentDescriptionExp="@classic_text_line1_talkback_AjE9RjwZ" y="0" interceptTouch="true">
+            <Triggers>
+              <Trigger action="up">
+                <FunctionCommand target="openClock"/>
+              </Trigger>
+            </Triggers>
+          </Button>
+        </Group>
+        <Group y="(ifelse(#isPad,ifelse(#is_ar_AjE9RjwZ,65,ifelse((#isRTL || #is_th_AjE9RjwZ),58,64)),ifelse(#is_ar_AjE9RjwZ,60,ifelse((#isRTL || #is_th_AjE9RjwZ),53,59))) * #scaleY)" visibility="(#lock_line2 != 0)">
+          <Text x="ifelse(#isRTL,(#view_width - #classic_clock_line2.text_width),0)" y="(#line2_text_margin_AjE9RjwZ * #scaleY)" size="#line2_fontsize_AjE9RjwZ" fontPath="@font_path_style_classic" fontPathWeight="#font_path_weight_classic" color="@clock_color" textExp="@classic_text_line_line2_AjE9RjwZ" visibility="(! #isRuleLine2_AjE9RjwZ)" name="classic_clock_line2"/>
+          <Text x="ifelse(#isRTL,(((#view_width - #classic_clock_line2.text_width) - (8 * #scale)) - #classic_clock_line2_date.text_width),(#classic_clock_line2.text_width + (8 * #scale)))" y="(#line2_text_margin_AjE9RjwZ * #scaleY)" size="#line2_fontsize_AjE9RjwZ" fontPath="@font_path_style_system" fontPathWeight="#font_path_weight_classic" color="@clock_color" textExp="@classic_text_line_line2_sub_AjE9RjwZ" visibility="(#lock_line2 == 204)" name="classic_clock_line2_date"/>
+          <Text x="ifelse(#isRTL,(((#view_width - #classic_clock_line2.text_width) - (1 * #scale)) - #classic_clock_line2_temperature_unit.text_width),(#classic_clock_line2.text_width + (1 * #scale)))" y="((- 8) * #scaleY)" size="#temperature_unit_font_size_AjE9RjwZ" fontPath="@font_path_style_system" fontPathWeight="#font_path_weight_classic" color="@clock_color" textExp="'°'" visibility="(#lock_line2 == 400)" name="classic_clock_line2_temperature_unit" alpha="255*0.6"/>
+          <Group visibility="#isRuleLine2_AjE9RjwZ">
+            <Text x="ifelse(#isRTL,ifelse(((#lock_line2 == 201) || (#lock_line2 == 203)),(#view_width - #classic_clock_line2_left.text_width),(((#view_width - #classic_clock_line2_right.text_width) - #classic_clock_line2_center.text_width) - #classic_clock_line2_left.text_width)),0)" y="(#line2_text_margin_AjE9RjwZ * #scaleY)" size="#line2_fontsize_AjE9RjwZ" fontPath="@font_path_style_classic" fontPathWeight="#font_path_weight_classic" color="@clock_color" textExp="@isRuleLine2_left_AjE9RjwZ" name="classic_clock_line2_left"/>
+            <Text y="(#line2_text_margin_2_AjE9RjwZ * #scaleY)" x="ifelse(#isRTL,ifelse(((#lock_line2 == 201) || (#lock_line2 == 203)),((#view_width - #classic_clock_line2_left.text_width) - #classic_clock_line2_center.text_width),((#view_width - #classic_clock_line2_right.text_width) - #classic_clock_line2_center.text_width)),#classic_clock_line2_left.text_width)" size="#line2_fontsize_AjE9RjwZ" fontPath="@font_path_style_classic" fontPathWeight="#font_path_weight_classic" color="@clock_color" textExp="'/'" name="classic_clock_line2_center" alpha="255*0.6"/>
+            <Text y="(#line2_text_margin_2_AjE9RjwZ * #scaleY)" x="ifelse(#isRTL,ifelse(((#lock_line2 == 201) || (#lock_line2 == 203)),(((#view_width - #classic_clock_line2_left.text_width) - #classic_clock_line2_center.text_width) - #classic_clock_line2_right.text_width),(#view_width - #classic_clock_line2_right.text_width)),#classic_clock_line2_left.text_width + #classic_clock_line2_center.text_width)" size="#line2_fontsize_AjE9RjwZ" fontPath="@font_path_style_classic" fontPathWeight="#font_path_weight_classic" color="@clock_color" textExp="formatDate('d',#time_sys)" name="classic_clock_line2_right"/>
+          </Group>
+          <Group>
+            <Group visibility="(#lock_line2 == 408)">
+              <Group>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (0 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (0 % 6)) * #scale))" y="ifelse((0 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((0 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((0 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((0 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (1 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (1 % 6)) * #scale))" y="ifelse((1 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((1 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((1 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((1 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (2 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (2 % 6)) * #scale))" y="ifelse((2 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((2 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((2 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((2 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (3 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (3 % 6)) * #scale))" y="ifelse((3 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((3 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((3 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((3 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (4 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (4 % 6)) * #scale))" y="ifelse((4 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((4 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((4 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((4 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (5 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (5 % 6)) * #scale))" y="ifelse((5 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((5 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((5 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((5 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (6 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (6 % 6)) * #scale))" y="ifelse((6 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((6 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((6 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((6 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (7 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (7 % 6)) * #scale))" y="ifelse((7 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((7 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((7 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((7 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (8 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (8 % 6)) * #scale))" y="ifelse((8 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((8 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((8 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((8 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (9 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (9 % 6)) * #scale))" y="ifelse((9 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((9 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((9 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((9 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (10 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (10 % 6)) * #scale))" y="ifelse((10 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((10 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((10 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((10 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (11 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (11 % 6)) * #scale))" y="ifelse((11 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((11 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((11 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((11 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+              </Group>
+            </Group>
+            <Image visibility="(#lock_line2 == 406)" x="ifelse(#isRTL,(#view_width - (124 * #scale)),(3.2 * #scale))" y="(4.8 * #scaleY)" w="(124 * #scale)" h="(37.6 * #scaleY)" srcExp="@feel_temperature_image_src_AjE9RjwZ" name="feel_temperature_image"/>
+            <Group x="ifelse(#isRTL,((#view_width - ((170 * 0.8) * #scale)) - (5 * #scale)),((4 * 0.8) * #scale))" visibility="(#lock_line2 == 403)">
+              <Image x="ifelse(((! #has_sunset) ** #hasweather),0,((120 * 0.8) * #scale))" y="((5 * 0.8) * #scaleY)" w="((12 * 0.8) * #scale)" h="((21 * 0.8) * #scaleY)" srcExp="ifelse(((! #has_sunset) ** #hasweather),(('assets/sunrise/arrow_up' + @use_dark_AjE9RjwZ) + '.png'),(('assets/sunrise/arrow_down' + @use_dark_AjE9RjwZ) + '.png'))"/>
+              <Text x="ifelse(((! #has_sunset) ** #hasweather),((14 * 0.8) * #scale),((134 * 0.8) * #scale))" y="((4 * 0.8) * #scaleY)" size="((17 * 0.8) * #scale)" fontPath="@font_path_style_system" fontPathWeight="#corner_text_font_weight_AjE9RjwZ" color="@clock_color" textExp="ifelse((! #hasweather),'--:--',ifelse((! #has_sunset),@sunrise_morning,@sunset_night))" alpha="255*0.6"/>
+              <Image x="0" y="((30 * 0.8) * #scaleY)" w="((170 * 0.8) * #scale)" h="ifelse((#lock_font_style == 22),((1.5 * 0.8) * #scaleY),ifelse((((#lock_font_style == 23) || (#lock_font_style == 24)) || (#lock_font_style == 25)),((3 * 0.8) * #scaleY),((2 * 0.8) * #scaleY)))" srcExp="ifelse(((#lock_font_style == 24) || (#lock_font_style == 25)),(('assets/sunrise/horizon_24' + @use_dark_AjE9RjwZ) + '.png'),(('assets/sunrise/horizon_21' + @use_dark_AjE9RjwZ) + '.png'))"/>
+              <Image x="ifelse(((! #has_sunset) ** #hasweather),((36 * 0.8) * #scale),0)" y="((- 2) * 0.8)" w="((162 * 0.8) * #scale)" h="((59 * 0.8) * #scaleY)" srcExp="ifelse((#lock_font_style == 22),(('assets/sunrise/curve_22' + @use_dark_AjE9RjwZ) + '.png'),ifelse((#lock_font_style == 23),(('assets/sunrise/curve_23' + @use_dark_AjE9RjwZ) + '.png'),ifelse(((#lock_font_style == 24) || (#lock_font_style == 25)),(('assets/sunrise/curve_24' + @use_dark_AjE9RjwZ) + '.png'),(('assets/sunrise/curve_21' + @use_dark_AjE9RjwZ) + '.png'))))" name="curve"/>
+              <Image x="#sun_x" y="#sun_y" w="ifelse((#lock_font_style == 22),((10 * 0.8) * #scale),ifelse((((#lock_font_style == 23) || (#lock_font_style == 24)) || (#lock_font_style == 25)),((14 * 0.8) * #scale),((12 * 0.8) * #scale)))" h="ifelse((#lock_font_style == 22),((10 * 0.8) * #scale),ifelse((((#lock_font_style == 23) || (#lock_font_style == 24)) || (#lock_font_style == 25)),((14 * 0.8) * #scale),((12 * 0.8) * #scale)))" srcExp="ifelse(#hasweather,(('assets/sunrise/sun_21' + @use_dark_AjE9RjwZ) + '.png'),'')" name="sun"/>
+            </Group>
+          </Group>
+          <Group>
+            <Text x="ifelse(#isRTL,ifelse((#lock_line2 == 406),((#view_width - ((124 + 11) * #scale)) - #classic_clock_line2_top.text_width),ifelse((#lock_line2 == 408),((#view_width - (((171 + 6) * 0.8) * #scale)) - #classic_clock_line2_top.text_width),ifelse(#isRuleLine2_AjE9RjwZ,(((#view_width - #classic_clock_line2_left.text_width - #classic_clock_line2_center.text_width - #classic_clock_line2_right.text_width) - #classic_clock_line2_top.text_width) - (3 * #scale)),(((#view_width - #classic_clock_line2.text_width) - #classic_clock_line2_top.text_width) - (3 * #scale))))),ifelse((#lock_line2 == 406),((124 + 11) * #scale),ifelse((#lock_line2 == 408),(((171 + 6) * 0.8) * #scale),ifelse(#isRuleLine2_AjE9RjwZ,(#classic_clock_line2_left.text_width + #classic_clock_line2_center.text_width + #classic_clock_line2_right.text_width + (3 * #scale)),(#classic_clock_line2.text_width + (3 * #scale))))))" y="ifelse((#is_bo_AjE9RjwZ ** ((((#lock_line2 == 202) || (#lock_line2 == 210)) || (#lock_line2 == 203)) || (#lock_line2 == 205))),((- 2) * #scaleY),ifelse((#is_bo_AjE9RjwZ ** (#lock_line2 == 407)),((- 3) * #scaleY),(1 * #scaleY)))" size="(16 * #scale)" fontPath="@font_path_style_system" fontPathWeight="#corner_text_font_weight_AjE9RjwZ" color="@clock_color" textExp="@classic_text_line_line2_top_AjE9RjwZ" name="classic_clock_line2_top" alpha="255*0.6"/>
+            <Text x="ifelse(#isRTL,ifelse(#isRuleLine2_AjE9RjwZ,(((#view_width - #classic_clock_line2_left.text_width - #classic_clock_line2_center.text_width - #classic_clock_line2_right.text_width) - #classic_clock_line2_bottom.text_width) - (3 * #scale)),(((#view_width - #classic_clock_line2.text_width) - #classic_clock_line2_bottom.text_width) - (3 * #scale))),ifelse(#isRuleLine2_AjE9RjwZ,(#classic_clock_line2_left.text_width + #classic_clock_line2_center.text_width + #classic_clock_line2_right.text_width + (3 * #scale)),(#classic_clock_line2.text_width + (3 * #scale))))" y="ifelse((#is_bo_AjE9RjwZ ** (#lock_line2 == 405)),(19 * #scaleY),(26 * #scaleY))" size="(16 * #scale)" fontPath="@font_path_style_system" fontPathWeight="#corner_text_font_weight_AjE9RjwZ" color="@clock_color" textExp="@classic_text_line_line2_bottom_AjE9RjwZ" name="classic_clock_line2_bottom" alpha="255*0.6"/>
+            <Image visibility="(((#lock_line2 == 500) || (#lock_line2 == 504)) || ((#lock_line2 == 407) ** (! #hasweather)))" x="ifelse(#isRTL,(((#view_width - #classic_clock_line2.text_width) - ifelse(((#lock_line2 == 407) ** (! #hasweather)),((40 * 0.8) * #scale),(20 * #scale))) - (3 * #scale)),(#classic_clock_line2.text_width + (3 * #scale)))" y="(2.4 * #scale)" w="ifelse(((#lock_line2 == 407) ** (! #hasweather)),((40 * 0.8) * #scale),(20 * #scale))" h="ifelse(((#lock_line2 == 407) ** (! #hasweather)),((21 * 0.8) * #scale),(20 * #scale))" srcExp="ifelse((#lock_line2 == 500),(('assets/health/health_0' + @use_dark_AjE9RjwZ) + '.png'),ifelse((#lock_line2 == 504),(('assets/health/health_1' + @use_dark_AjE9RjwZ) + '.png'),ifelse(((#lock_line2 == 407) ** (! #hasweather)),(('assets/placeholder_text' + @use_dark_AjE9RjwZ) + '.png'),'')))" name="classic_clock_line2_image_top"/>
+            <Image visibility="((((((#lock_line2 == 400) ** #hasweather) || (#lock_line2 == 402)) || (#lock_line2 == 407)) || (#lock_line2 == 409)) || ((#lock_line2 == 405) ** (! #hasweather)))" x="ifelse(#isRTL,((((#view_width - #classic_clock_line2.text_width) - ifelse((#lock_line2 == 400),#classic_clock_line2_temperature_unit.text_width,0)) - ifelse((#lock_line2 == 405),((40 * 0.8) * #scale),ifelse(((#lock_line2 == 409) || (#lock_line2 == 402)),(16 * #scale),(20 * #scale)))) - (3 * #scale)),((#classic_clock_line2.text_width + ifelse((#lock_line2 == 400),(#classic_clock_line2_temperature_unit.text_width - (5 * #scale)),0)) + (3 * #scale)))" y="ifelse((#lock_line2 == 409),(32 * #scale),(26 * #scale))" w="ifelse((#lock_line2 == 405),((40 * 0.8) * #scale),ifelse(((#lock_line2 == 409) || (#lock_line2 == 402)),(16 * #scale),(20 * #scale)))" h="ifelse((#lock_line2 == 405),((21 * 0.8) * #scale),ifelse((#lock_line2 == 409),(16 * #scale),(20 * #scale)))" srcExp="ifelse(((#lock_line2 == 400) ** #hasweather),((((('assets/weather/' + ifelse(#has_sunset,'day','night')) + '/weather_') + #weather_id) + @use_dark_AjE9RjwZ) + '.png'),ifelse((#lock_line2 == 402),(('assets/rain' + @use_dark_AjE9RjwZ) + '.png'),ifelse(((#lock_line2 == 407) ** #hasweather),((('assets/wind/wind_' + #weather_wind_direction_image_AjE9RjwZ) + @use_dark_AjE9RjwZ) + '.png'),ifelse(((#lock_line2 == 407) ** (! #hasweather)),(('assets/placeholder_icon' + @use_dark_AjE9RjwZ) + '.png'),ifelse(((#lock_line2 == 409) ** #hasweather),((('assets/pressure/' + @weather_pressure_image_AjE9RjwZ) + @use_dark_AjE9RjwZ) + '.png'),ifelse(((#lock_line2 == 409) ** (! #hasweather)),(('assets/placeholder_icon' + @use_dark_AjE9RjwZ) + '.png'),ifelse(((#lock_line2 == 405) ** (! #hasweather)),(('assets/placeholder_text' + @use_dark_AjE9RjwZ) + '.png'),'')))))))" name="classic_clock_line2_image_bottom"/>
+          </Group>
+          <Button x="ifelse(#isRTL,0,((- 5) * #scale))" w="#view_width" h="(48 * #scaleY)" contentDescriptionExp="@classic_text_line2_talkback_AjE9RjwZ" y="0" interceptTouch="true">
+            <Triggers>
+              <Trigger action="up">
+                <FunctionCommand target="openClassicLine2App"/>
+              </Trigger>
+            </Triggers>
+          </Button>
+        </Group>
+        <Group y="ifelse((#lock_line2 == 0),(ifelse(#isPad,62,59) * #scaleY),(ifelse(#isPad,ifelse(#is_ar_AjE9RjwZ,122,ifelse((#isRTL || #is_th_AjE9RjwZ),108,120)),ifelse(#is_ar_AjE9RjwZ,112,ifelse((#isRTL || #is_th_AjE9RjwZ),99,110))) * #scaleY))" visibility="(#lock_line3 != 0)">
+          <Text x="ifelse(#isRTL,(#view_width - #classic_clock_line3.text_width),0)" y="(#line3_text_margin_AjE9RjwZ * #scaleY)" size="#line3_fontsize_AjE9RjwZ" fontPath="@font_path_style_classic" fontPathWeight="#font_path_weight_classic" color="@clock_color" textExp="@classic_text_line_line3_AjE9RjwZ" visibility="(! #isRuleLine3_AjE9RjwZ)" name="classic_clock_line3"/>
+          <Text x="ifelse(#isRTL,(((#view_width - #classic_clock_line3.text_width) - (8 * #scale)) - #classic_clock_line3_date.text_width),(#classic_clock_line3.text_width + (8 * #scale)))" y="(#line3_text_margin_AjE9RjwZ * #scaleY)" size="#line3_fontsize_AjE9RjwZ" fontPath="@font_path_style_system" fontPathWeight="#font_path_weight_classic" color="@clock_color" textExp="@classic_text_line_line3_sub_AjE9RjwZ" visibility="(#lock_line3 == 204)" name="classic_clock_line3_date"/>
+          <Text x="ifelse(#isRTL,(((#view_width - #classic_clock_line3.text_width) - (1 * #scale)) - #classic_clock_line3_temperature_unit.text_width),(#classic_clock_line3.text_width + (1 * #scale)))" y="((- 8) * #scaleY)" size="#temperature_unit_font_size_AjE9RjwZ" fontPath="@font_path_style_system" fontPathWeight="#font_path_weight_classic" color="@clock_color" textExp="'°'" visibility="(#lock_line3 == 400)" name="classic_clock_line3_temperature_unit" alpha="255*0.6"/>
+          <Group visibility="#isRuleLine3_AjE9RjwZ">
+            <Text x="ifelse(#isRTL,ifelse(((#lock_line3 == 201) || (#lock_line3 == 203)),(#view_width - #classic_clock_line3_left.text_width),(((#view_width - #classic_clock_line3_right.text_width) - #classic_clock_line3_center.text_width) - #classic_clock_line3_left.text_width)),0)" y="(#line3_text_margin_AjE9RjwZ * #scaleY)" size="#line3_fontsize_AjE9RjwZ" fontPath="@font_path_style_classic" fontPathWeight="#font_path_weight_classic" color="@clock_color" textExp="@isRuleLine3_left_AjE9RjwZ" name="classic_clock_line3_left"/>
+            <Text y="(#line3_text_margin_2_AjE9RjwZ * #scaleY)" x="ifelse(#isRTL,ifelse(((#lock_line3 == 201) || (#lock_line3 == 203)),((#view_width - #classic_clock_line3_left.text_width) - #classic_clock_line3_center.text_width),((#view_width - #classic_clock_line3_right.text_width) - #classic_clock_line3_center.text_width)),#classic_clock_line3_left.text_width)" size="#line3_fontsize_AjE9RjwZ" fontPath="@font_path_style_classic" fontPathWeight="#font_path_weight_classic" color="@clock_color" textExp="'/'" name="classic_clock_line3_center" alpha="255*0.6"/>
+            <Text y="(#line3_text_margin_2_AjE9RjwZ * #scaleY)" x="ifelse(#isRTL,ifelse(((#lock_line3 == 201) || (#lock_line3 == 203)),(((#view_width - #classic_clock_line3_left.text_width) - #classic_clock_line3_center.text_width) - #classic_clock_line3_right.text_width),(#view_width - #classic_clock_line3_right.text_width)),#classic_clock_line3_left.text_width + #classic_clock_line3_center.text_width)" size="#line3_fontsize_AjE9RjwZ" fontPath="@font_path_style_classic" fontPathWeight="#font_path_weight_classic" color="@clock_color" textExp="formatDate('d',#time_sys)" name="classic_clock_line3_right"/>
+          </Group>
+          <Group>
+            <Group visibility="(#lock_line3 == 408)">
+              <Group>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (0 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (0 % 6)) * #scale))" y="ifelse((0 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((0 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((0 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((0 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (1 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (1 % 6)) * #scale))" y="ifelse((1 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((1 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((1 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((1 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (2 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (2 % 6)) * #scale))" y="ifelse((2 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((2 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((2 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((2 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (3 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (3 % 6)) * #scale))" y="ifelse((3 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((3 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((3 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((3 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (4 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (4 % 6)) * #scale))" y="ifelse((4 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((4 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((4 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((4 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (5 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (5 % 6)) * #scale))" y="ifelse((5 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((5 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((5 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((5 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (6 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (6 % 6)) * #scale))" y="ifelse((6 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((6 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((6 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((6 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (7 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (7 % 6)) * #scale))" y="ifelse((7 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((7 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((7 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((7 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (8 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (8 % 6)) * #scale))" y="ifelse((8 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((8 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((8 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((8 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (9 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (9 % 6)) * #scale))" y="ifelse((9 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((9 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((9 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((9 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (10 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (10 % 6)) * #scale))" y="ifelse((10 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((10 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((10 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((10 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+                <Image x="ifelse(#isRTL,((#view_width - ((((26 + 3) * 0.8) * (11 % 6)) * #scale)) - (20 * #scale)),((((26 + 3) * 0.8) * (11 % 6)) * #scale))" y="ifelse((11 { 6),((2.5 * 0.8) * #scaleY),((30.5 * 0.8) * #scaleY))" w="((26 * 0.8) * #scale)" h="((26 * 0.8) * #scale)" srcExp="ifelse((#humidityIndex == #_humidityIndex),ifelse((11 { #humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png')),ifelse((11 { #_humidityIndex),(('assets/humidity/full' + @use_dark_AjE9RjwZ) + '.png'),ifelse((11 } #_humidityIndex),(('assets/humidity/null' + @use_dark_AjE9RjwZ) + '.png'),(('assets/humidity/half' + @use_dark_AjE9RjwZ) + '.png'))))"/>
+              </Group>
+            </Group>
+            <Image visibility="(#lock_line3 == 406)" x="ifelse(#isRTL,(#view_width - (124 * #scale)),(3.2 * #scale))" y="(4.8 * #scaleY)" w="(124 * #scale)" h="(37.6 * #scaleY)" srcExp="@feel_temperature_image_src_AjE9RjwZ" name="feel_temperature_image"/>
+            <Group x="ifelse(#isRTL,((#view_width - ((170 * 0.8) * #scale)) - (5 * #scale)),((4 * 0.8) * #scale))" visibility="(#lock_line3 == 403)">
+              <Image x="ifelse(((! #has_sunset) ** #hasweather),0,((120 * 0.8) * #scale))" y="((5 * 0.8) * #scaleY)" w="((12 * 0.8) * #scale)" h="((21 * 0.8) * #scaleY)" srcExp="ifelse(((! #has_sunset) ** #hasweather),(('assets/sunrise/arrow_up' + @use_dark_AjE9RjwZ) + '.png'),(('assets/sunrise/arrow_down' + @use_dark_AjE9RjwZ) + '.png'))"/>
+              <Text x="ifelse(((! #has_sunset) ** #hasweather),((14 * 0.8) * #scale),((134 * 0.8) * #scale))" y="((4 * 0.8) * #scaleY)" size="((17 * 0.8) * #scale)" fontPath="@font_path_style_system" fontPathWeight="#corner_text_font_weight_AjE9RjwZ" color="@clock_color" textExp="ifelse((! #hasweather),'--:--',ifelse((! #has_sunset),@sunrise_morning,@sunset_night))" alpha="255*0.6"/>
+              <Image x="0" y="((30 * 0.8) * #scaleY)" w="((170 * 0.8) * #scale)" h="ifelse((#lock_font_style == 22),((1.5 * 0.8) * #scaleY),ifelse((((#lock_font_style == 23) || (#lock_font_style == 24)) || (#lock_font_style == 25)),((3 * 0.8) * #scaleY),((2 * 0.8) * #scaleY)))" srcExp="ifelse(((#lock_font_style == 24) || (#lock_font_style == 25)),(('assets/sunrise/horizon_24' + @use_dark_AjE9RjwZ) + '.png'),(('assets/sunrise/horizon_21' + @use_dark_AjE9RjwZ) + '.png'))"/>
+              <Image x="ifelse(((! #has_sunset) ** #hasweather),((36 * 0.8) * #scale),0)" y="((- 2) * 0.8)" w="((162 * 0.8) * #scale)" h="((59 * 0.8) * #scaleY)" srcExp="ifelse((#lock_font_style == 22),(('assets/sunrise/curve_22' + @use_dark_AjE9RjwZ) + '.png'),ifelse((#lock_font_style == 23),(('assets/sunrise/curve_23' + @use_dark_AjE9RjwZ) + '.png'),ifelse(((#lock_font_style == 24) || (#lock_font_style == 25)),(('assets/sunrise/curve_24' + @use_dark_AjE9RjwZ) + '.png'),(('assets/sunrise/curve_21' + @use_dark_AjE9RjwZ) + '.png'))))" name="curve"/>
+              <Image x="#sun_x" y="#sun_y" w="ifelse((#lock_font_style == 22),((10 * 0.8) * #scale),ifelse((((#lock_font_style == 23) || (#lock_font_style == 24)) || (#lock_font_style == 25)),((14 * 0.8) * #scale),((12 * 0.8) * #scale)))" h="ifelse((#lock_font_style == 22),((10 * 0.8) * #scale),ifelse((((#lock_font_style == 23) || (#lock_font_style == 24)) || (#lock_font_style == 25)),((14 * 0.8) * #scale),((12 * 0.8) * #scale)))" srcExp="ifelse(#hasweather,(('assets/sunrise/sun_21' + @use_dark_AjE9RjwZ) + '.png'),'')" name="sun"/>
+            </Group>
+          </Group>
+          <Group>
+            <Text x="ifelse(#isRTL,ifelse((#lock_line3 == 406),((#view_width - ((124 + 11) * #scale)) - #classic_clock_line3_top.text_width),ifelse((#lock_line3 == 408),((#view_width - (((171 + 6) * 0.8) * #scale)) - #classic_clock_line3_top.text_width),ifelse(#isRuleLine3_AjE9RjwZ,(((#view_width - #classic_clock_line3_left.text_width - #classic_clock_line3_center.text_width - #classic_clock_line3_right.text_width) - #classic_clock_line3_top.text_width) - (3 * #scale)),(((#view_width - #classic_clock_line3.text_width) - #classic_clock_line3_top.text_width) - (3 * #scale))))),ifelse((#lock_line3 == 406),((124 + 11) * #scale),ifelse((#lock_line3 == 408),(((171 + 6) * 0.8) * #scale),ifelse(#isRuleLine3_AjE9RjwZ,(#classic_clock_line3_left.text_width + #classic_clock_line3_center.text_width + #classic_clock_line3_right.text_width + (3 * #scale)),(#classic_clock_line3.text_width + (3 * #scale))))))" y="ifelse((#is_bo_AjE9RjwZ ** ((((#lock_line3 == 202) || (#lock_line3 == 210)) || (#lock_line3 == 203)) || (#lock_line3 == 205))),((- 2) * #scaleY),ifelse((#is_bo_AjE9RjwZ ** (#lock_line3 == 407)),((- 3) * #scaleY),(1 * #scaleY)))" size="(16 * #scale)" fontPath="@font_path_style_system" fontPathWeight="#corner_text_font_weight_AjE9RjwZ" color="@clock_color" textExp="@classic_text_line_line3_top_AjE9RjwZ" name="classic_clock_line3_top" alpha="255*0.6"/>
+            <Text x="ifelse(#isRTL,ifelse(#isRuleLine3_AjE9RjwZ,(((#view_width - #classic_clock_line3_left.text_width - #classic_clock_line3_center.text_width - #classic_clock_line3_right.text_width) - #classic_clock_line3_bottom.text_width) - (3 * #scale)),(((#view_width - #classic_clock_line3.text_width) - #classic_clock_line3_bottom.text_width) - (3 * #scale))),ifelse(#isRuleLine3_AjE9RjwZ,(#classic_clock_line3_left.text_width + #classic_clock_line3_center.text_width + #classic_clock_line3_right.text_width + (3 * #scale)),(#classic_clock_line3.text_width + (3 * #scale))))" y="ifelse((#is_bo_AjE9RjwZ ** (#lock_line3 == 405)),(19 * #scaleY),(26 * #scaleY))" size="(16 * #scale)" fontPath="@font_path_style_system" fontPathWeight="#corner_text_font_weight_AjE9RjwZ" color="@clock_color" textExp="@classic_text_line_line3_bottom_AjE9RjwZ" name="classic_clock_line3_bottom" alpha="255*0.6"/>
+            <Image visibility="(((#lock_line3 == 500) || (#lock_line3 == 504)) || ((#lock_line3 == 407) ** (! #hasweather)))" x="ifelse(#isRTL,(((#view_width - #classic_clock_line3.text_width) - ifelse(((#lock_line3 == 407) ** (! #hasweather)),((40 * 0.8) * #scale),(20 * #scale))) - (3 * #scale)),(#classic_clock_line3.text_width + (3 * #scale)))" y="(2.4 * #scale)" w="ifelse(((#lock_line3 == 407) ** (! #hasweather)),((40 * 0.8) * #scale),(20 * #scale))" h="ifelse(((#lock_line3 == 407) ** (! #hasweather)),((21 * 0.8) * #scale),(20 * #scale))" srcExp="ifelse((#lock_line3 == 500),(('assets/health/health_0' + @use_dark_AjE9RjwZ) + '.png'),ifelse((#lock_line3 == 504),(('assets/health/health_1' + @use_dark_AjE9RjwZ) + '.png'),ifelse(((#lock_line3 == 407) ** (! #hasweather)),(('assets/placeholder_text' + @use_dark_AjE9RjwZ) + '.png'),'')))" name="classic_clock_line3_image_top"/>
+            <Image visibility="((((((#lock_line3 == 400) ** #hasweather) || (#lock_line3 == 402)) || (#lock_line3 == 407)) || (#lock_line3 == 409)) || ((#lock_line3 == 405) ** (! #hasweather)))" x="ifelse(#isRTL,((((#view_width - #classic_clock_line3.text_width) - ifelse((#lock_line3 == 400),#classic_clock_line3_temperature_unit.text_width,0)) - ifelse((#lock_line3 == 405),((40 * 0.8) * #scale),ifelse(((#lock_line3 == 409) || (#lock_line3 == 402)),(16 * #scale),(20 * #scale)))) - (3 * #scale)),((#classic_clock_line3.text_width + ifelse((#lock_line3 == 400),(#classic_clock_line3_temperature_unit.text_width - (5 * #scale)),0)) + (3 * #scale)))" y="ifelse((#lock_line3 == 409),(32 * #scale),(26 * #scale))" w="ifelse((#lock_line3 == 405),((40 * 0.8) * #scale),ifelse(((#lock_line3 == 409) || (#lock_line3 == 402)),(16 * #scale),(20 * #scale)))" h="ifelse((#lock_line3 == 405),((21 * 0.8) * #scale),ifelse((#lock_line3 == 409),(16 * #scale),(20 * #scale)))" srcExp="ifelse(((#lock_line3 == 400) ** #hasweather),((((('assets/weather/' + ifelse(#has_sunset,'day','night')) + '/weather_') + #weather_id) + @use_dark_AjE9RjwZ) + '.png'),ifelse((#lock_line3 == 402),(('assets/rain' + @use_dark_AjE9RjwZ) + '.png'),ifelse(((#lock_line3 == 407) ** #hasweather),((('assets/wind/wind_' + #weather_wind_direction_image_AjE9RjwZ) + @use_dark_AjE9RjwZ) + '.png'),ifelse(((#lock_line3 == 407) ** (! #hasweather)),(('assets/placeholder_icon' + @use_dark_AjE9RjwZ) + '.png'),ifelse(((#lock_line3 == 409) ** #hasweather),((('assets/pressure/' + @weather_pressure_image_AjE9RjwZ) + @use_dark_AjE9RjwZ) + '.png'),ifelse(((#lock_line3 == 409) ** (! #hasweather)),(('assets/placeholder_icon' + @use_dark_AjE9RjwZ) + '.png'),ifelse(((#lock_line3 == 405) ** (! #hasweather)),(('assets/placeholder_text' + @use_dark_AjE9RjwZ) + '.png'),'')))))))" name="classic_clock_line3_image_bottom"/>
+          </Group>
+          <Button x="ifelse(#isRTL,0,((- 5) * #scale))" w="#view_width" h="(56 * #scaleY)" contentDescriptionExp="@classic_text_line3_talkback_AjE9RjwZ" y="0" interceptTouch="true">
+            <Triggers>
+              <Trigger action="up">
+                <FunctionCommand target="openClassicLine3App"/>
+              </Trigger>
+            </Triggers>
+          </Button>
+        </Group>
+      </Group>
+    </Group>
+    <Group visibility="(! eqs(@lock_templateId,'classic'))" y="(19.5 * #scaleY)">
+      <Group x="ifelse(((#is_ug ** (! #isRTL)) ** ((#lock_line2 == 500) || (#lock_line2 == 504))),(((#view_width - (80 * #scale)) - #top_classic_plus_left.text_width-#top_classic_plus_right.text_width-#top_classic_plus_right_unit.text_width-#top_classic_plus_right_goal_data.text_width) / 2),ifelse(#isRTL,(((#view_width - (22 * #scale)) - #top_classic_plus_left.text_width-#top_classic_plus_right.text_width-#top_classic_plus_right_light.text_width) / 2),(((#view_width - (38 * #scale)) - #top_classic_plus_left.text_width-#top_classic_plus_right.text_width-#top_classic_plus_right_light.text_width) / 2)))" visibility="(((#lock_line2 == 400) || (#lock_line2 == 500)) || (#lock_line2 == 504))">
+        <Text visibility="(! #isRTL)" textExp="@easy_date" color="@clock_color" size="#classic_plus_line1_font_size" name="top_classic_plus_left" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="380" interceptTouch="true" touchable="true"/>
+        <Image visibility="(! #isRTL)" x="(#top_classic_plus_left.text_width + (6 * #scale))" y="(2.5 * #scaleY)" w="(20 * #scale)" h="(20 * #scale)" srcExp="ifelse((#lock_line2 == 400),ifelse(#hasweather,((((('assets/weather/' + ifelse(#has_sunset,'day','night')) + '/weather_') + #weather_id) + @use_dark) + '.png'),(('assets/placeholder_icon' + @use_dark) + '.png')),ifelse((#lock_line2 == 500),(('assets/health/health_0' + @use_dark) + '.png'),ifelse((#lock_line2 == 504),(('assets/health/health_1' + @use_dark) + '.png'),'')))" name="top_classic_plus_image_center"/>
+        <Text visibility="((! #is_ug) ** (! #isRTL))" x="(#top_classic_plus_left.text_width + (26 * #scale))" color="@clock_color" size="(19 * #scale)" textExp="@classic_plus_text" name="top_classic_plus_right" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="380" interceptTouch="true" touchable="true"/>
+        <Text visibility="((! #is_ug) ** (! #isRTL))" x="(#top_classic_plus_left.text_width+#top_classic_plus_right.text_width + (26 * #scale))" color="@clock_color" size="(19 * #scale)" textExp="ifelse((#lock_line2 == 500),('/' + ifelse(#hasSteps,strReplaceAll(ifelse((#mi_steps_goal == 1),@health_mi_steps_one,@health_mi_steps),'SLOT_VAL',#mi_steps_goal),('-- ' + @health_mi_steps_unit))),ifelse((#lock_line2 == 504),('/' + ifelse(#hasSteps,strReplaceAll(ifelse((#mi_stand_goal == 1),@health_mi_stands_one,@health_mi_stands),'stand',#mi_stand_goal),('-- ' + @health_mi_stands_unit))),''))" name="top_classic_plus_right_light" alpha="255*0.6" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="380" interceptTouch="true" touchable="true"/>
+        <Group visibility="(#is_ug ** (! #isRTL))">
+          <Text x="(#top_classic_plus_left.text_width + (32 * #scale))" color="@clock_color" size="#classic_plus_line1_font_size" textExp="ifelse((#lock_line2 == 500),@health_mi_steps_unit,ifelse((#lock_line2 == 504),@health_mi_stands_unit,''))" alpha="255*0.6" name="top_classic_plus_right_unit" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="380" interceptTouch="true" touchable="true"/>
+          <Text x="(#top_classic_plus_left.text_width+#top_classic_plus_right_unit.text_width + (36 * #scale))" color="@clock_color" size="#classic_plus_line1_font_size" textExp="@classic_plus_text" name="top_classic_plus_right" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="380" interceptTouch="true" touchable="true"/>
+          <Text visibility="((#lock_line2 == 500) || (#lock_line2 == 504))" x="(#top_classic_plus_left.text_width+#top_classic_plus_right_unit.text_width+#top_classic_plus_right.text_width + (36 * #scale))" color="@clock_color" size="#classic_plus_line1_font_size" textExp="('/' + ifelse((! #hasSteps),'--',ifelse((#lock_line2 == 500),#mi_steps_goal,ifelse((#lock_line2 == 504),#mi_stand_goal,''))))" alpha="255*0.6" name="top_classic_plus_goal_data" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="380" interceptTouch="true" touchable="true"/>
+        </Group>
+        <Text visibility="#isRTL" textExp="ifelse((#lock_line2 == 500),ifelse(#hasSteps,((((#mi_step + '/') + #mi_steps_goal) + ' ') + ifelse((#mi_steps_goal == 1),@health_mi_steps_unit_one,@health_mi_steps_unit)),(('--' + ' ') + @health_mi_steps_unit)),ifelse((#lock_line2 == 504),ifelse(#hasSteps,((((#mi_stand + '/') + #mi_stand_goal) + ' ') + ifelse((#mi_stand_goal == 1),@health_mi_stands_unit_one,@health_mi_stands_unit)),(('--' + ' ') + @health_mi_stands_unit)),@classic_plus_text))" color="@clock_color" size="#classic_plus_line1_font_size" name="top_classic_plus_left" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="380" interceptTouch="true" touchable="true"/>
+        <Text visibility="#isRTL" x="#top_classic_plus_left.text_width" color="@clock_color" size="#classic_plus_line1_font_size" textExp="''" name="top_classic_plus_right_light" alpha="255*0.6" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="380" interceptTouch="true" touchable="true"/>
+        <Image visibility="#isRTL" x="#top_classic_plus_left.text_width+#top_classic_plus_right_light.text_width" y="(1 * #scaleY)" w="(20 * #scale)" h="(20 * #scale)" srcExp="ifelse((#lock_line2 == 400),ifelse(#hasweather,((((('assets/weather/' + ifelse(#has_sunset,'day','night')) + '/weather_') + #weather_id) + @use_dark) + '.png'),(('assets/placeholder_icon' + @use_dark) + '.png')),ifelse((#lock_line2 == 500),(('assets/health/health_0' + @use_dark) + '.png'),ifelse((#lock_line2 == 504),(('assets/health/health_1' + @use_dark) + '.png'),'')))" name="top_classic_plus_image_center"/>
+        <Text visibility="#isRTL" x="(#top_classic_plus_left.text_width+#top_classic_plus_right_light.text_width + (22 * #scale))" textExp="formatDate('dd E',#time_sys)" color="@clock_color" size="#classic_plus_line1_font_size" name="top_classic_plus_right" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="380" interceptTouch="true" touchable="true"/>
+      </Group>
+      <Text textExp="@classic_plus_text" color="@clock_color" size="#classic_plus_line1_font_size" x="(#view_width / 2)" visibility="(((((#lock_line2 == 0) || (#lock_line2 == 11)) || (#lock_line2 == 100)) || (#lock_line2 == 101)) || (#lock_line2 == 103))" name="top_classic_plus_center" align="center" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="380" interceptTouch="true" touchable="true"/>
+      <Group visibility="((((((#lock_line2 == 401) || (#lock_line2 == 404)) || (#lock_line2 == 405)) || (#lock_line2 == 406)) || (#lock_line2 == 407)) || (#lock_line2 == 408))" x="((((#view_width - (4 * #scale)) - #top_classic_plus_center.text_width-#top_classic_plus_center_dot.text_width-#top_classic_plus_center_info.text_width) - ifelse(((! #hasweather) ** ((#lock_line2 == 405) || (#lock_line2 == 407))),((40 * 0.8) * #scale),0)) / 2)">
+        <Text visibility="(! #isRTL)" textExp="@easy_date" color="@clock_color" size="#classic_plus_line1_font_size" name="top_classic_plus_center" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="380" interceptTouch="true" touchable="true"/>
+        <Text visibility="(! #isRTL)" x="(#top_classic_plus_center.text_width + (3 * #scale))" textExp="'·'" color="@clock_color" size="#classic_plus_line1_font_size" name="top_classic_plus_center_dot" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="380" interceptTouch="true" touchable="true"/>
+        <Text visibility="(! #isRTL)" textExp="@classic_plus_text" color="@clock_color" size="#classic_plus_line1_font_size" x="(#top_classic_plus_center.text_width + (15 * #scale))" name="top_classic_plus_center_info" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="380" interceptTouch="true" touchable="true"/>
+        <Text visibility="#isRTL" textExp="@classic_plus_text" color="@clock_color" size="#classic_plus_line1_font_size" name="top_classic_plus_center_info" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="380" interceptTouch="true" touchable="true"/>
+        <Text visibility="#isRTL" x="(#top_classic_plus_center_info.text_width + (3 * #scale))" textExp="'·'" color="@clock_color" size="#classic_plus_line1_font_size" name="top_classic_plus_center_dot" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="380" interceptTouch="true" touchable="true"/>
+        <Text visibility="#isRTL" textExp="formatDate('dd E',#time_sys)" color="@clock_color" size="#classic_plus_line1_font_size" x="(#top_classic_plus_center_info.text_width + (15 * #scale))" name="top_classic_plus_center" fontPath="/system/fonts/MiSansVF.ttf" fontPathWeight="380" interceptTouch="true" touchable="true"/>
+        <Image visibility="((! #hasweather) ** ((#lock_line2 == 405) || (#lock_line2 == 407)))" x="(#top_classic_plus_center.text_width+#top_classic_plus_center_info.text_width + (15 * #scale))" y="(5 * #scaleY)" w="((40 * 0.8) * #scale)" h="((21 * 0.8) * #scaleY)" srcExp="(('assets/placeholder_text' + @use_dark) + '.png')" name="top_classic_plus_image_null"/>
+      </Group>
+      <Button x="(#view_width / 2)" w="ifelse((#is_ug ** ((#lock_line2 == 500) || (#lock_line2 == 504))),((80 * #scale) + #top_classic_plus_left.text_width+#top_classic_plus_right.text_width+#top_classic_plus_right_unit.text_width+#top_classic_plus_right_goal_data.text_width),ifelse((((#lock_line2 == 400) || (#lock_line2 == 500)) || (#lock_line2 == 504)),((38 * #scale) + #top_classic_plus_left.text_width+#top_classic_plus_right.text_width+#top_classic_plus_right_light.text_width),ifelse(((((((#lock_line2 == 401) || (#lock_line2 == 404)) || (#lock_line2 == 405)) || (#lock_line2 == 406)) || (#lock_line2 == 407)) || (#lock_line2 == 408)),(((4 * #scale) + #top_classic_plus_center.text_width+#top_classic_plus_center_dot.text_width+#top_classic_plus_center_info.text_width) + ifelse(((! #hasweather) ** ((#lock_line2 == 405) || (#lock_line2 == 407))),((40 * 0.8) * #scale),0)),#top_classic_plus_center.text_width)))" h="(25 * #scaleY)" contentDescriptionExp="@classic_plus_text_talkback" align="center">
+        <Triggers>
+          <Trigger action="up">
+            <FunctionCommand target="openPlusApp"/>
+          </Trigger>
+        </Triggers>
+      </Button>
+      <DateTime x="(#view_width / 2)" y="ifelse(eqs(@local,'BO'),(((27 + 9) * #scaleY) - ((#center_classic_plus.text_height - (96 * #scale)) / 2)),(((19 + 9) * #scaleY) - ((#center_classic_plus.text_height - (96 * #scale)) / 2)))" formatExp="ifelse(#time_format,'HH:mm','h:mm')" color="@clock_color" size="(96 * #scale)" fontPath="@font_path_style_plus" fontPathWeight="#lock_font_weight" name="center_classic_plus" align="center"/>
+      <Button y="(25 * #scaleY)" w="#view_width" h="#center_classic_plus.text_height" contentDescriptionExp="formatDate(ifelse(#time_format,'HH:mm','h:mm'),#time_sys)" x="0">
+        <Triggers>
+          <Trigger action="up">
+            <FunctionCommand target="openClock"/>
+          </Trigger>
+        </Triggers>
+      </Button>
+    </Group>
+  </Group>
+  <VariableBinders>
+    <SettingsBinder name="settings">
+      <Variable name="lockInfo" type="string" category="secure" key="constant_template_editor_info"/>
+      <Variable name="auto_dual_clock" type="number" category="system" key="auto_dual_clock"/>
+      <Variable name="resident_timezone" type="string" category="system" key="resident_timezone"/>
+      <Trigger>
+        <MultiCommand condition="(! eqs(@lockInfo,''))">
+          <VariableCommand name="data" expression="strToJson(@lockInfo)" type="jsonO"/>
+          <VariableCommand name="lock_clockInfo" expression="jsonGetObject(jsonGetObject($data, 'lockscreenInfo'),'clockInfo')" type="jsonO"/>
+        </MultiCommand>
+        <VariableCommand name="lock_templateId" expression="jsonGetString($lock_clockInfo, 'templateId')" type="string"/>
+        <VariableCommand name="lock_style" expression="jsonGetInt($lock_clockInfo, 'style')" type="number"/>
+        <VariableCommand name="lock_line1" expression="jsonGetInt($lock_clockInfo, 'classicLine2')" type="number"/>
+        <VariableCommand name="lock_line2" expression="ifelse(eqs(@lock_templateId,'classic'),jsonGetInt($lock_clockInfo, 'classicLine3'),ifelse((eqs(@lock_templateId,'classic_plus') || (eqs(@lock_templateId,'all_in_one') ** (((#lock_style == 1) || (#lock_style == 2)) || (#lock_style == 3)))),jsonGetInt($lock_clockInfo, 'classicLine1'),0))" type="number"/>
+        <VariableCommand name="lock_line3" expression="jsonGetInt($lock_clockInfo, 'classicLine4')" type="number"/>
+        <VariableCommand name="lock_font_style" expression="ifelse(eqs(@lock_templateId,'classic'),jsonGetInt($lock_clockInfo, 'style'),ifelse((eqs(@lock_templateId,'classic_plus') || (eqs(@lock_templateId,'all_in_one') ** (((#lock_style == 1) || (#lock_style == 2)) || (#lock_style == 3)))),jsonGetInt($lock_clockInfo, 'fontStyle'),21))" type="number"/>
+        <VariableCommand name="lock_font_weight" expression="ifelse(((eqs(@lock_templateId,'classic') || eqs(@lock_templateId,'classic_plus')) || (eqs(@lock_templateId,'all_in_one') ** (((#lock_style == 1) || (#lock_style == 2)) || (#lock_style == 3)))),ifelse((jsonGetInt($lock_clockInfo, 'clockWeight') == 0),420,jsonGetInt($lock_clockInfo, 'clockWeight')),420)" type="number"/>
+        <MultiCommand condition="(#auto_dual_clock ** (! eqs(@timezone_id,@resident_timezone)))">
+          <MultiCommand condition="((! #prev_display_dual_clock) || (! eqs(@resident_timezone,@prev_resident_timezone)))">
+            <VariableCommand name="dual_zone_info_uri" expression="'android'" type="string"/>
+            <BinderCommand name="hasrightzone" command="refresh"/>
+            <AnimationCommand target="frame" command="play"/>
+          </MultiCommand>
+          <MultiCommand condition="((! #prev_display_dual_clock) || (! eqs(@timezone_id,@prev_timezone_id)))">
+            <VariableCommand name="zone_info_uri" expression="'android'" type="string"/>
+            <BinderCommand name="hasleftzone" command="refresh"/>
+            <AnimationCommand target="frame" command="play"/>
+          </MultiCommand>
+          <VariableCommand name="prev_resident_timezone" expression="@resident_timezone" type="string"/>
+          <VariableCommand name="prev_timezone_id" expression="@timezone_id" type="string"/>
+        </MultiCommand>
+        <VariableCommand name="prev_display_dual_clock" expression="ifelse((#auto_dual_clock ** (! eqs(@timezone_id,@resident_timezone))),1,0)" type="number"/>
+        <MultiCommand condition="(#auto_dual_clock ** (! eqs(@timezone_id,@resident_timezone)))">
+          <AnimationCommand target="frame" command="play"/>
+        </MultiCommand>
+        <MultiCommand condition="(((#lock_line2 }= 400) ** (#lock_line2 {= 409)) || ((#lock_line3 }= 400) ** (#lock_line3 {= 409)))">
+          <BinderCommand name="WeatherProvider" command="refresh"/>
+          <BinderCommand name="HourlyWeatherProvider" command="refresh"/>
+        </MultiCommand>
+        <MultiCommand condition="((((#lock_line2 == 500) || (#lock_line3 == 500)) || (#lock_line2 == 504)) || (#lock_line3 == 504))">
+          <VariableCommand name="dummy" expression="'health'" type="string"/>
+          <BinderCommand name="MiSteps" command="refresh"/>
+          <BinderCommand name="MiStand" command="refresh"/>
+        </MultiCommand>
+      </Trigger>
+    </SettingsBinder>
+    <ContentProviderBinder name="WeatherProvider" uriExp="('content://weather/weatherData/1/' + @localId)" columns="weather_type,temperature,description,aqilevel,ultraviolet,feel_temperature,wind,wind_direction,wind_power,humidity,pressure,next_hour_rain_probability" countName="hasweather">
+      <Variable name="weather_type" column="weather_type" type="number"/>
+      <Variable name="weather_temperature" column="temperature" type="number"/>
+      <Variable name="weather_description" column="description" type="string"/>
+      <Variable name="weather_aqilevel" column="aqilevel" type="number"/>
+      <Variable name="weather_ultraviolet" column="ultraviolet" type="number"/>
+      <Variable name="weather_feel_temperature" column="feel_temperature" type="number"/>
+      <Variable name="weather_wind" column="wind" type="string"/>
+      <Variable name="wind_direction" column="wind_direction" type="number"/>
+      <Variable name="wind_power" column="wind_power" type="number"/>
+      <Variable name="weather_humidity" column="humidity" type="number"/>
+      <Variable name="weather_pressure" column="pressure" type="number"/>
+      <Variable name="weather_next_hour_rain_probability" column="next_hour_rain_probability" type="number"/>
+      <Trigger>
+        <VariableCommand name="weather_id" expression="ifelse(((#weather_type } 25) || (#weather_type { 0)),0,ifelse(((#weather_type }= 4) ** (#weather_type {= 6)),9,ifelse((#weather_type == 8),11,ifelse((#weather_type == 13),15,ifelse((#weather_type == 14),17,ifelse(((#weather_type }= 18) ** (#weather_type {= 20)),21,ifelse((#weather_type == 25),12,#weather_type)))))))" type="number"/>
+        <VariableCommand name="weather_uvi_desc" expression="ifelse((#weather_ultraviolet }= 9),@weather_uvi_very_strong,ifelse((#weather_ultraviolet }= 6),@weather_uvi_strong,ifelse((#weather_ultraviolet }= 3),@weather_uvi_moderate,@weather_uvi_weak)))" type="string"/>
+        <VariableCommand name="weather_wind_direction" expression="ifelse(((#wind_direction }= 337.5) || (#wind_direction { 22.25)),@weather_wind_n,ifelse(((#wind_direction }= 22.25) ** (#wind_direction { 67.5)),@weather_wind_ne,ifelse(((#wind_direction }= 67.5) ** (#wind_direction { 112.5)),@weather_wind_e,ifelse(((#wind_direction }= 112.5) ** (#wind_direction { 157.5)),@weather_wind_se,ifelse(((#wind_direction }= 157.5) ** (#wind_direction { 202.5)),@weather_wind_s,ifelse(((#wind_direction }= 202.5) ** (#wind_direction { 247.5)),@weather_wind_sw,ifelse(((#wind_direction }= 247.5) ** (#wind_direction { 292.5)),@weather_wind_w,@weather_wind_nw)))))))" type="string"/>
+        <VariableCommand name="weather_wind_power" expression="ifelse((#wind_power }= 118),12,ifelse((#wind_power }= 103),11,ifelse((#wind_power }= 89),10,ifelse((#wind_power }= 75),9,ifelse((#wind_power }= 62),8,ifelse((#wind_power }= 50),7,ifelse((#wind_power }= 39),6,ifelse((#wind_power }= 29),5,ifelse((#wind_power }= 20),4,ifelse((#wind_power }= 12),3,ifelse((#wind_power }= 6),2,ifelse((#wind_power }= 2),1,0))))))))))))" type="number"/>
+        <VariableCommand name="humidityIndex" expression="((int(#weather_humidity) / 100) * 12)" type="number"/>
+        <VariableCommand name="_humidityIndex" expression="int(#humidityIndex)" type="number"/>
+        <VariableCommand name="humidityIndex" expression="ifelse((#humidityIndex == #_humidityIndex),#humidityIndex,(#_humidityIndex + 0.5))" type="number"/>
+      </Trigger>
+    </ContentProviderBinder>
+    <ContentProviderBinder name="HourlyWeatherProvider" uriExp="('content://weather/hourlyData/4/' + @localId)" columns="sunrise,sunset" countName="hashourlydata">
+      <Variable name="weather_sunrise" column="sunrise" type="number"/>
+      <Variable name="weather_sunset" column="sunset" type="number"/>
+      <Trigger>
+        <VariableCommand name="sunrise_time" expression="(#weather_sunrise + #time0)" type="number"/>
+        <VariableCommand name="sunset_time" expression="(#weather_sunset + #time0)" type="number"/>
+        <VariableCommand name="sunrise_morning" expression="formatDate(ifelse(#time_format,'H:mm','h:mm'),#sunrise_time)" type="string"/>
+        <VariableCommand name="sunset_night" expression="formatDate(ifelse(#time_format,'H:mm','h:mm'),#sunset_time)" type="string"/>
+        <VariableCommand name="has_sunset" expression="ifelse(((#time_sys }= #sunrise_time) ** (#time_sys {= #sunset_time)),1,0)" type="number"/>
+        <VariableCommand name="if_tomorrow" expression="ifelse(((#time_sys } #sunset_time) ** (#time_sys { #time24)),1,0)" type="number"/>
+        <VariableCommand name="day_or_night" expression="ifelse(#has_sunset,((@weather_sunset_time + ' ') + @sunset_night),((@weather_sunrise_time + ' ') + @sunrise_morning))" type="string"/>
+        <VariableCommand name="day_or_night_talkback" expression="ifelse(#has_sunset,((@weather_sunset_time_talkback + ' ') + @sunset_night),((ifelse(#if_tomorrow,@weather_tomorrow_sunrise_time_talkback,@weather_today_sunrise_time_talkback) + ' ') + @sunrise_morning))" type="string"/>
+        <VariableCommand name="sun_x" expression="ifelse((#time_sys }= (#time24 - ((15 * 60) * 1000))),#midnight_x,ifelse((#time_sys }= (#sunset_time + ((15 * 60) * 1000))),#night_x,ifelse((#time_sys }= #sunset_time),#sunset_x,ifelse((#time_sys }= (#time12 + ((30 * 60) * 1000))),#afternoon_x,ifelse((#time_sys }= (#time12 - ((30 * 60) * 1000))),#noon_x,ifelse((#time_sys }= (#sunrise_time + ((15 * 60) * 1000))),#morning_x,ifelse((#time_sys }= #sunrise_time),#sunrise_x,ifelse((#time_sys }= (#time0 + ((15 * 60) * 1000))),#dawn_x,#zero_x))))))))" type="number"/>
+        <VariableCommand name="sun_y" expression="ifelse((#time_sys }= (#time24 - ((15 * 60) * 1000))),#midnight_y,ifelse((#time_sys }= (#sunset_time + ((15 * 60) * 1000))),#night_y,ifelse((#time_sys }= #sunset_time),#sunset_y,ifelse((#time_sys }= (#time12 + ((30 * 60) * 1000))),#afternoon_y,ifelse((#time_sys }= (#time12 - ((30 * 60) * 1000))),#noon_y,ifelse((#time_sys }= (#sunrise_time + ((15 * 60) * 1000))),#morning_y,ifelse((#time_sys }= #sunrise_time),#sunrise_y,ifelse((#time_sys }= (#time0 + ((15 * 60) * 1000))),#dawn_y,#zero_y))))))))" type="number"/>
+      </Trigger>
+    </ContentProviderBinder>
+    <ContentProviderBinder name="MiSteps" uriExp="(('content://com.mi.' + @dummy) + '.provider.main/activity/steps/brief')" columns="steps,goal" countName="hasSteps">
+      <Variable name="mi_step" column="steps" type="number"/>
+      <Variable name="mi_steps_goal" column="goal" type="number"/>
+      <Trigger/>
+    </ContentProviderBinder>
+    <ContentProviderBinder name="MiStand" uriExp="(('content://com.mi.' + @dummy) + '.provider.main/widget/stand/simple')" columns="finished,goal" countName="hasStand">
+      <Variable name="mi_stand" column="finished" type="number"/>
+      <Variable name="mi_stand_goal" column="goal" type="number"/>
+    </ContentProviderBinder>
+    <ContentProviderBinder name="hasrightzone" uriExp="(('content://com.' + @dual_zone_info_uri) + '.settings.provider.MiuiSettingsDataProvider/dual_zone_info')" countName="hasRightZone" columns="zone_id,zone_displayname,zone_timename,dual_clock_enable,zone_time_offset">
+      <Variable name="dual_clock_right_zone_id" column="zone_id" type="string"/>
+      <Variable name="dual_clock_right_zone_displayname" column="zone_displayname" type="string"/>
+      <Variable name="dual_clock_right_zone_timename" column="zone_timename" type="string"/>
+      <Variable name="dual_clock_enable" column="dual_clock_enable" type="number"/>
+      <Variable name="dual_clock_right_zone_time_offset" column="zone_time_offset" type="number"/>
+      <Trigger/>
+    </ContentProviderBinder>
+    <ContentProviderBinder name="hasleftzone" uriExp="(('content://com.' + @zone_info_uri) + '.settings.provider.MiuiSettingsDataProvider/zone_info')" countName="hasLeftZone" columns="zone_id,zone_displayname,auto_time_zone,zone_timename,zone_time_offset">
+      <Variable name="dual_clock_left_zone_id" column="zone_id" type="string"/>
+      <Variable name="dual_clock_left_zone_displayname" column="zone_displayname" type="number"/>
+      <Variable name="auto_time_zone" column="auto_time_zone" type="string"/>
+      <Variable name="dual_clock_left_zone_timename" column="zone_timename" type="string"/>
+      <Variable name="dual_clock_left_zone_time_offset" column="zone_time_offset" type="number"/>
+      <Trigger/>
+    </ContentProviderBinder>
+    <BroadcastBinder action="android.intent.action.TIME_SET">
+      <Trigger>
+        <VariableCommand name="solar_term_index" expression="0" type="number"/>
+        <FunctionCommand target="refreshTimezoneId"/>
+        <BinderCommand name="settings" command="refresh"/>
+      </Trigger>
+    </BroadcastBinder>
+    <BroadcastBinder action="android.intent.action.DATE_CHANGED">
+      <Trigger>
+        <VariableCommand name="solar_term_index" expression="0" type="number"/>
+        <FunctionCommand target="refreshTimezoneId"/>
+        <BinderCommand name="settings" command="refresh"/>
+      </Trigger>
+    </BroadcastBinder>
+  </VariableBinders>
+  <ExternalCommands>
+    <Trigger action="init">
+      <FunctionCommand target="requestData"/>
+      <FunctionCommand target="get_solar_term_index"/>
+      <MethodCommand target="thisContext" targetType="var" class="com.miui.maml.util.SystemProperties" method="get" returnType="string" return="deviceType" paramTypes="String" params="'ro.build.characteristics'"/>
+    </Trigger>
+    <Trigger action="resume">
+      <FunctionCommand target="requestData"/>
+    </Trigger>
+  </ExternalCommands>
+</Widget>
