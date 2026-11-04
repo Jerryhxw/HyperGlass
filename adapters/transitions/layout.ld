@@ -44,3 +44,5 @@ scope_current_icon = 0x19bf198;
 scope_window_icon = 0x1b1495c;
 scope_maml_icon = 0x19c08e4;
 scope_window_maml = 0x1b15874;
+source_tag_return = 0x1b14738;
+source_tag_tail = 0x11f8168;

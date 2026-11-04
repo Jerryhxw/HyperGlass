@@ -3,9 +3,9 @@ import os
 from pathlib import Path
 import json,struct,sys
 from elftools.elf.elffile import ELFFile
-from unicorn import Uc,UC_ARCH_ARM64,UC_MODE_ARM
+from unicorn import Uc,UC_ARCH_ARM64,UC_MODE_ARM,UC_HOOK_CODE
 import unicorn.arm64_const as R
-from model import Image,branch_target
+from model import Image,branch_target,immediate
 H=Path(__file__).resolve().parent;EX=H.parents[1]/'adapters'
 # Shared synthetic Dart objects from the complete reference adapter suite.
 fixture=(EX/'transitions/test_adapters.py').read_text().split('for fw,fh,floor in ')[0]
@@ -39,6 +39,52 @@ for planpath,imagepath in zip(sys.argv[1::2],sys.argv[2::2]):
   u.reg_write(R.UC_ARM64_REG_SP,0x2ee000);q(u,0x300070,0x12345)
   return u
  target=Image(Path(imagepath))
+ # The flight source distinguishes duplicate icons in different containers.
+ # Reuse the original component/user interpolation and its GC return PCs.
+ tail=address(0x11f8168);start,size,_=target.names['AppInfoModel.getcomponentNameString'][0]
+ calls=[(pc,branch_target(int.from_bytes(target.read(pc,4),'little'),pc))for pc in range(tail-base,start+size,4)if int.from_bytes(target.read(pc,4),'little')&0xfc000000==0x94000000]
+ allocate=calls[0];interpolate=next(call for call in calls if call[1]==target.names['_StringBase._interpolate'][0][0])
+ separator_load=next(int.from_bytes(target.read(pc,4),'little')for pc in range(tail-base,interpolate[0],4)if int.from_bytes(target.read(pc,4),'little')&0xffc003ff==0xf9400370)
+ for recommended,identity,user in [(True,-1,0),(True,128,10),(False,-1,0),(False,128,10)]:
+  u=setup();fp=u.reg_read(regs[29]);sp=u.reg_read(regs[15])
+  model,hero,package,component,separator,prefix,result,array=[heap+x for x in [0x35001,0x36001,0x37001,0x37101,0x37201,0x37301,0x38001,0x39001]]
+  u.mem_write(model+7,struct.pack('<q',identity));q(u,model+0x73,user)
+  w(u,hero+7,package);w(u,hero+11,component)
+  for obj,data in [(package,b'recent_example'if recommended else b'ordinary_example'),(prefix,b'recent_')]:
+   w(u,obj+7,len(data)*2);u.mem_write(obj+15,data)
+  add,load=struct.unpack('<2I',u.mem_read(address(symbols['source_tag_prefix']),8))
+  prefix_offset=immediate(add)+immediate(load);q(u,0x300000+prefix_offset,prefix)
+  # Leave every other frame slot null: the current compiler's exact source
+  # slot must be replayed, including the shift between the two launchers.
+  for off in range(-0x200,-0x100,8):q(u,fp+off,nil)
+  hero_word=struct.unpack('<I',u.mem_read(address(symbols['source_tag_hero']),4))[0]
+  q(u,fp+immediate(hero_word),hero)
+  q(u,0x300000+((separator_load>>10)&4095)*8,separator)
+  u.reg_write(regs[1],model);u.reg_write(regs[30],0x3f0000);seen=[]
+  def source_call(u,pc,size,data):
+   if pc==base+allocate[1]:
+    assert u.reg_read(regs[30])==base+allocate[0]+4
+    assert u.reg_read(regs[2])==10
+    frame=u.reg_read(regs[29]);assert qi(u,frame-0x18)==model and qi(u,frame-0x10)==hero
+    assert qi(u,frame-8)==package
+    seen.append('allocate');u.reg_write(regs[0],array)
+   elif pc==base+interpolate[1]:
+    assert u.reg_read(regs[30])==base+interpolate[0]+4
+    assert qi(u,u.reg_read(regs[15]))==array
+    assert [wi(u,array+off)for off in [15,19,23,27,31]]==[int(v)&0xffffffff for v in [package,separator,component,separator,user*2]]
+    seen.append('interpolate');u.reg_write(regs[0],result)
+   elif pc==0x3f0000:
+    assert u.reg_read(regs[1])==model
+    assert u.reg_read(regs[30])==address(0x1b14738)
+    seen.append('canonical');u.reg_write(regs[0],result)
+   else:return
+   u.reg_write(R.UC_ARM64_REG_PC,u.reg_read(regs[30]))
+  u.hook_add(UC_HOOK_CODE,source_call)
+  u.emu_start(address(0x1b14734),address(0x1b14738),count=10000)
+  assert u.reg_read(R.UC_ARM64_REG_PC)==address(0x1b14738)
+  assert u.reg_read(regs[0])==result and u.reg_read(regs[29])==fp and u.reg_read(regs[15])==sp
+  assert seen==(['allocate','interpolate']if recommended else['canonical'])
+ print('PASS recommendation source/user tags; ordinary/desktop dispatch and original Dart safepoints:',Path(planpath).name,flush=True)
  caches=target.names.get('BigIconGetUtil.loadFlightImage',[])
  if caches:
   cache=caches[0][0];capture=target.names['RenderRepaintBoundary.toImage'][0][0]

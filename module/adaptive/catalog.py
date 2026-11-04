@@ -125,14 +125,14 @@ class Catalog:
   # Replay current compiler frame slots and canonical empty-widget pool loads.
   if self.model.image.path.name!='libapp.so':return
   linked=ELFFile(open(EX/'transitions/capture.elf','rb'));syms={s.name:s['st_value']for s in linked.get_section_by_name('.symtab').iter_symbols()}
-  for symbol,reference,opcode in [('android_text_inline',0x10e5e00,0xf81d03a4),('bytes_gateway',0x1b15198,0x92802cf1),('android_empty_widget',0x113976c,0),('android_empty_widget',0x1139770,0)]:
+  for symbol,reference,opcode in [('android_text_inline',0x10e5e00,0xf81d03a4),('bytes_gateway',0x1b15198,0x92802cf1),('android_empty_widget',0x113976c,0),('android_empty_widget',0x1139770,0),('source_tag_hero',0x1b13fa4,0),('source_tag_prefix',0x9ebd4c,0),('source_tag_prefix',0x9ebd50,0)]:
    pc=syms[symbol];unit=self.unit_at(pc);assert unit
    old=struct.unpack('<I',self.model.image.read(reference,4))[0]
    positions=[]
    for q in range(pc,min(pc+40,unit.source+len(unit.data)),4):
     if struct.unpack_from('<I',unit.data,q-unit.source)[0]==old:positions.append(q)
    if len(positions)!=1:raise ValueError(('missing replay',symbol,positions,hex(old)))
-   q=positions[0];unit.relocations.append(Reloc(q-unit.source,8,Target(reference,self.model.add(reference),0),old))
+   q=positions[0];unit.relocations.append(Reloc(q-unit.source,8,Target(reference,self.model.add(reference,frames=False if symbol.startswith('source_tag_') else None),0),old))
  def add_config(self):
   self.config_source=0xb33600
   specs=[(0,0xfb6228),(1,0xfc55cc),(2,0xa07d04),(3,0x1038114),(4,0x1037d80),(5,0x14ebf74),(7,0xc1e528),(8,0xc19da0),(15,0xfaa65c),(17,0x18d99a4),(18,0x18d994c),(30,0xc2e648)]
@@ -172,13 +172,13 @@ def catalogs():
  a.add_elf(EX/'transitions/capture.elf',['.capture_config','.capture_meta','.bridge'],6)
  rows=json.loads((EX/'transitions/profile.json').read_text())['patches'];a.add_rows(rows,len(json.loads((EX/'icons/profile.json').read_text())['patches']))
  a.add_config()
- for name,group in [('ImageFilterGroup.processAll',1),('IconRenderer.renderThemed',1),('OffsetLayer.toImage',2),('OffsetLayer._createSceneForImage',2),('IconCaptureUtil._imageToResult',2),('ShortcutIconWidget._addMessage',2)]:
+ for name,group in [('ImageFilterGroup.processAll',1),('IconRenderer.renderThemed',1),('OffsetLayer.toImage',2),('OffsetLayer._createSceneForImage',2),('IconCaptureUtil._imageToResult',2),('ShortcutIconWidget._addMessage',2),('AppInfoModel.getcomponentNameString',2)]:
   function=a.model.image.names[name][0];pc=function[0]+8;anchor=a.model.add(pc,frames=True)
   a.units.append(Unit('Dart frame ABI: '+name,pc,b'',group,False,anchor))
  a.constraints.append((2,a.model.add(0x1722088),a.model.add(0x1722030),0x58))
  # Core Dart object offsets used by allocation-free adapters must retain their
  # ABI. Resolve their accessor instructions semantically, then check offsets.
- for pc in [0xa030a4,0xa03338,0xa03350,0xfa9b7c,0xfa9cb0,0xfb4d50,0x1562774,0x191a5f4,0x191a5f8]:
+ for pc in [0x15edb70,0x15edba0,0x11f8168,0x11f81ac,0xa030a4,0xa03338,0xa03350,0xfa9b7c,0xfa9cb0,0xfb4d50,0x1562774,0x191a5f4,0x191a5f8]:
   value=immediate(struct.unpack('<I',a.model.image.read(pc,4))[0])
   a.constraints.append((2,a.model.add(pc,frames=False),-1,value))
  a.relocate()

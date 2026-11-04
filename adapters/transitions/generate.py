@@ -44,6 +44,7 @@ for va in [0xb32828,0xce275c,0x11f308c]:patch(va,bytes.fromhex('e00316aac0035fd6
 symbols={s.name:s['st_value']for s in linked.get_section_by_name('.symtab').iter_symbols()}
 sites=[(0x1562730,'capture_transform'),(0xa02914,'root_gateway'),(0xa02928,'refresh_path'),(0x1562380,'force_path'),(0x1562434,'stop_after_path'),(0x1562124,'capture_image_filter'),(0x1563768,'capture_color_filter'),(0x1563970,'capture_shader_mask'),(0x15629c4,'capture_opacity'),(0x191a74c,'mark_floor'),(0x191a8b8,'mark_ceil'),(0x19c0040,'result_gateway'),(0x1b15198,'bytes_gateway'),(0xa1e608,'clone_pack'),(0xa1e634,'clone_unpack')]
 for va,name in sites:patch(va,branch(va,symbols[name]),'Keep wallpaper sampling in the full viewport; crop pixels before native SF drawing')
+patch(0x1b14734,branch(0x1b14734,symbols['source_controller_tag']),'Resolve recommendation icon controllers using the exact flight source identity')
 for va,name in [(0x10e5e00,'android_text_inline'),(0x173d854,'android_background'),(0x10d4bc0,'android_image_plate')]:patch(va,branch(va,symbols[name]),'Common Android widget content: monochrome text and structural background painting with provider outlines intact')
 for va in [0xfc6748,0xfc7638,0xfc84a8]:patch(va,bytes.fromhex('e00316aac0035fd6'),'Omit native Frame/Linear/Relative container background painting, retain provider geometry and foreground controls')
 patch(0x19bfda8,branch(0x19bfda8,0x19bff18),'Preserve captured rounded edges; native SF supplies the animated clip')

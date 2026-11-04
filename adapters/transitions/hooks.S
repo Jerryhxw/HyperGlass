@@ -182,6 +182,54 @@ android_background_original:
  ldur w2,[x1,#0xb]
  b android_background_continue
 .section .capture_root,"ax"
+.global source_controller_tag,source_tag_hero
+source_controller_tag:
+ // Resolve recommendation copies by their flight identity. Other containers
+ // retain their canonical controller tags, which can omit the Hero prefix.
+ b source_tag_hero
+source_tag_canonical:
+ mov x16,x30
+ adrp x30,source_tag_return
+ add x30,x30,:lo12:source_tag_return
+ br x16
+source_tag_hero:
+ mov x17,#-0x128
+ ldr x3,[x29,x17]
+ mov x10,x0
+.global source_tag_prefix
+source_tag_prefix:
+ // Replay the recommendation prefix selected by HeroTagResolver.getPrefix.
+ add x0,x27,#0xb,lsl #12
+ ldr x0,[x0,#0x158]
+ mov x16,x0
+ mov x0,x10
+ ldur w17,[x3,#7]
+ add x17,x17,x28,lsl #32
+ ldur w12,[x16,#7]
+ ldur w13,[x17,#7]
+ cmp w13,w12
+ b.lo source_tag_canonical
+ lsr w12,w12,#1
+ cbz w12,source_tag_canonical
+ add x16,x16,#15
+ add x17,x17,#15
+source_tag_compare:
+ ldrb w13,[x16],#1
+ ldrb w14,[x17],#1
+ cmp w13,w14
+ b.ne source_tag_canonical
+ subs w12,w12,#1
+ b.ne source_tag_compare
+ adrp x30,source_tag_return
+ add x30,x30,:lo12:source_tag_return
+ // Match getcomponentNameString's frame and preserve its model/component roots.
+ // Every allocating call and its return PC stays in the original Dart code.
+ stp x29,x30,[x15,#-16]!
+ mov x29,x15
+ sub x15,x15,#0x20
+ stur x1,[x29,#-0x18]
+ stur x3,[x29,#-0x10]
+ b source_tag_tail
 // Offscreen layers on the capture path would hide the wallpaper from the
 // target's backdrop sampling (gesture return fades and tints the workspace).
 .global capture_color_filter,capture_shader_mask,capture_opacity
