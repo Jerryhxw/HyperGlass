@@ -457,9 +457,18 @@ static H int is_launcher(void) {
     e++;
   return same((S){cmd, e}, "com.miui.home");
 }
+/*
+ * v9: 跳过对 MAML 系统组件（天气/运动健康等）的玻璃重构，让它们保持 HyperOS 出厂渲染。
+ * 原因：注入的 Glass_Bionic_Medium_Regular 玻璃饱和度偏高且偏红，字节层无法调低，
+ * 与图标/文件夹/第三方 AppWidget 的原生奶白玻璃观感不一致（详见 upstream issue #1）。
+ * 设为 0 可恢复原生 HyperGlass 行为（MAML 组件重新注入玻璃）。
+ */
+static int hg_skip_maml_restyle = 1;
 T void parse_hook(void *out, const char *src, size_t n) {
   size_t size = n;
-  char *styled = is_launcher() ? style_xml(src, n, &size) : 0;
+  char *styled = (!hg_skip_maml_restyle && is_launcher())
+                     ? style_xml(src, n, &size)
+                     : 0;
   parse_original(out, styled ? styled : src, size);
   if (styled)
     free(styled);
