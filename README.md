@@ -1,4 +1,18 @@
-# HyperGlass 1.0.1
+# HyperGlass 1.0.1（Jerryhxw fork）
+
+> ⚠️ 本仓库是 [finall1008/HyperGlass](https://github.com/finall1008/HyperGlass) 的**个人 fork**，由 [Jerryhxw](https://github.com/Jerryhxw) 维护，非原作者发布。上游原仓库见链接。
+
+## 与上游的差异（v9）
+
+本 fork 默认**跳过 MAML 系统组件**（天气、运动健康等）的玻璃重构，让它们保持 HyperOS 出厂渲染（彩色卡片）；图标、文件夹、第三方 AppWidget 的原生奶白玻璃不受影响。
+
+原因与实测结论见 [upstream issue #1](https://github.com/finall1008/HyperGlass/issues/1)：注入的 `Glass_Bionic_Medium_Regular` 玻璃饱和度偏高、偏红，字节层无法调低，无法与图标原生玻璃统一。
+
+改动位置：`adapters/widgets/loader.c` 新增开关 `hg_skip_maml_restyle`（默认 `1`）；设为 `0` 即恢复上游原生行为。
+
+---
+
+## 上游介绍
 
 HyperOS 系统桌面的 LSPosed 模块，提供单色玻璃图标、文件夹、动态日历和时钟，以及 MAML / Android 小组件样式。包名为 `dev.hyperglass.lsposed`，作用域为 `com.miui.home`。
 
